@@ -1,18 +1,18 @@
 package com.example.runners;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import android.Manifest;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,15 +28,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class Atividade extends AppCompatActivity implements OnMapReadyCallback {
+public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
-    private SupportMapFragment mMapFragment;
     private GoogleMap mGoogleMap;
+    private SupportMapFragment mMapFragment;
 
     private static final int REQUEST_FINE_LOCATION = 100;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -44,33 +43,57 @@ public class Atividade extends AppCompatActivity implements OnMapReadyCallback {
     private LocationCallback mLocationCallback;
     private Geocoder mGeocoder;
 
-    Button btnBeginAtua;
-    Button btnterminaAtividade;
-    TextView txtLocation;
-    TextView txtGeode;
+    private TextView txtLocation;
+    private TextView txtGeode;
+    private Button btnBeginAtua;
+    private Button btnterminaAtividade;
+    private Button btnListarAtividade;
+
+    Context context;
+
+    public FragmentAtividade() {
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+    }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        View view = inflater.inflate(R.layout.fragment_atividade, container, false);
+
+        btnBeginAtua = view.findViewById(R.id.btnBeginAtua);
+        btnterminaAtividade = view.findViewById(R.id.btn_terminaAtividade);
+        btnListarAtividade = view.findViewById(R.id.btn_listarAtividades);
+        txtLocation = view.findViewById(R.id.txtLocation);
+        txtGeode = view.findViewById(R.id.txtGeode);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(5000);
         mLocationRequest.setFastestInterval(5000);
 
-        mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
-        btnterminaAtividade = findViewById(R.id.btn_terminaAtividade);
-        txtLocation = findViewById(R.id.txtLocation);
-        txtGeode = findViewById(R.id.txtGeode);
 
-        btnBeginAtua = findViewById(R.id.btnBeginAtua);
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    Toast.makeText(getActivity(), "Atualizou a localização", Toast.LENGTH_SHORT).show();
+                    addMarker(location);
+                    int Speed = (int) ((location.getSpeed() * 3600 / 1000));
+                    txtLocation.setText(" Latitude: " + location.getLatitude() + "\n Longitude: " + location.getLongitude() + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + Speed);
+                    Geocoder(location);
+                }
+            }
+        };
+
         btnBeginAtua.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,88 +101,55 @@ public class Atividade extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
 
-        mLocationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                for (Location location : locationResult.getLocations()) {
-                    Toast.makeText(Atividade.this, "Atualizou a localização", Toast.LENGTH_SHORT).show();
-                    addMarker(location);
-                    txtLocation.setText(" Latitude: " + location.getLatitude() + "\n Longitude: " +  location.getLongitude() + "\n Altitude: " + location.getAltitude() +  "\n Velocidade: " + (location.getSpeed()*3600)/1000);
-                    Geocoder(location);
-                }
-            }
-        };
         btnterminaAtividade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopLocationUpdates();
-                Toast.makeText(Atividade.this, "Parou a atividade", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(Atividade.this, AtividadeTerminada.class));
             }
         });
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+        btnListarAtividade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((Cliques)context).mudarFrag();
+            }
+        });
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
+        return view;
     }
 
     private void getLastLocation() {
-        if (ActivityCompat.checkSelfPermission(this,
+        if (ActivityCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions();
             return;
         }
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            Toast.makeText(getApplicationContext(), "Success!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "Success!", Toast.LENGTH_LONG).show();
                             addMarker(location);
-                            txtLocation.setText(" Latitude: " + location.getLatitude() + "\n Longitude: " +  location.getLongitude()  + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + (location.getSpeed()*3600)/1000);
+                            txtLocation.setText(" Latitude: " + location.getLatitude() + "\n Longitude: " + location.getLongitude() + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + (location.getSpeed() * 3600) / 1000);
                             Geocoder(location);
                         }
                     }
                 })
-                .addOnFailureListener(this, new OnFailureListener() {
+                .addOnFailureListener(getActivity(), new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Errou ao obter localização!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Errou ao obter localização!", Toast.LENGTH_LONG).show();
                     }
                 });
-    }
-
-
-    private void requestPermissions() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                REQUEST_FINE_LOCATION);
-    }
-
-    private void startLocationUpdates() {
-        //verificar pemissoes
-        mFusedLocationClient.requestLocationUpdates(mLocationRequest,
-                mLocationCallback,
-                null);
     }
 
     private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
-
-    public void Geocoder(Location location){
-        mGeocoder = new Geocoder (Atividade.this, Locale.getDefault());
+    public void Geocoder(Location location) {
+        mGeocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
             List<Address> lista = mGeocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             //txtGeode.setText(lista.get(0).getAddressLine(0)); //ESCREVE A MORADA NUMA TEXTVIEW
@@ -168,7 +158,6 @@ public class Atividade extends AppCompatActivity implements OnMapReadyCallback {
         }
     }
 
-    @Override
     public void onMapReady(GoogleMap map) {
         mGoogleMap = map;
         //LatLng latLng = new LatLng(41.3662, -8.19928);
@@ -184,6 +173,31 @@ public class Atividade extends AppCompatActivity implements OnMapReadyCallback {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+    }
+
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(getActivity(),
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                REQUEST_FINE_LOCATION);
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions();
+            return;
+        }
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context=context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
 }

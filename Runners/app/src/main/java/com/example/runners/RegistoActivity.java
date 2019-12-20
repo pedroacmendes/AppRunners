@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class RegistoActivity extends AppCompatActivity {
@@ -28,7 +27,7 @@ public class RegistoActivity extends AppCompatActivity {
         btn_signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(RegistoActivity.this, Atividade.class));
+                startActivity(new Intent(RegistoActivity.this, MainActivity.class));
                 finish();
             }
         });
