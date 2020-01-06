@@ -4,4 +4,6 @@ public interface Cliques {
 
     void mudarFrag();
 
+    void mudarFrag2();
+
 }

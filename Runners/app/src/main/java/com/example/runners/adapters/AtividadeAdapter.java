@@ -26,7 +26,7 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
     @Override
     public AtividadeAdapter.AtividadeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View v = inflater.inflate(R.layout.atividade_item, parent, false);
+        View v = inflater.inflate(R.layout.activity_item_fragment, parent, false);
 
         return new AtividadeHolder(v);
     }

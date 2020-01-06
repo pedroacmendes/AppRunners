@@ -2,15 +2,23 @@ package com.example.runners;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,11 +34,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
@@ -57,12 +68,14 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_atividade, container, false);
+
 
         btnBeginAtua = view.findViewById(R.id.btnBeginAtua);
         btnterminaAtividade = view.findViewById(R.id.btn_terminaAtividade);
@@ -80,7 +93,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
 
-
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -88,7 +100,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getActivity(), "Atualizou a localização", Toast.LENGTH_SHORT).show();
                     addMarker(location);
                     int Speed = (int) ((location.getSpeed() * 3600 / 1000));
-                    txtLocation.setText(" Latitude: " + location.getLatitude() + "\n Longitude: " + location.getLongitude() + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + Speed);
+                    txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude() + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + Speed);
                     Geocoder(location);
                 }
             }
@@ -104,7 +116,10 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         btnterminaAtividade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 stopLocationUpdates();
+                ((Cliques)context).mudarFrag2();
+
             }
         });
 
@@ -131,7 +146,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                         if (location != null) {
                             Toast.makeText(getContext(), "Success!", Toast.LENGTH_LONG).show();
                             addMarker(location);
-                            txtLocation.setText(" Latitude: " + location.getLatitude() + "\n Longitude: " + location.getLongitude() + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + (location.getSpeed() * 3600) / 1000);
+                            int Speed = (int) ((location.getSpeed() * 3600 / 1000));
+                            txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude() + "\n Altitude: " + location.getAltitude() + "\n Velocidade: " + Speed);
                             Geocoder(location);
                         }
                     }
@@ -172,6 +188,10 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     public void addMarker(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
+        mGoogleMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title("Atual localização"));
+
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
     }
 
@@ -199,5 +219,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     public void onDetach() {
         super.onDetach();
     }
+
 
 }
