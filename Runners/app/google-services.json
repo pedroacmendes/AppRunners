@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "335722391414",
+    "firebase_url": "https://runners-d8501.firebaseio.com",
+    "project_id": "runners-d8501",
+    "storage_bucket": "runners-d8501.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335722391414:android:bc33cb2544147e7cdc7c57",
+        "android_client_info": {
+          "package_name": "com.example.runners"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335722391414-26r524ival96eln4q8amcoqk5ovlgu0i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBioUWIGoVIOJ8K1XT1X1Pq-H1mm4Bji2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335722391414-26r524ival96eln4q8amcoqk5ovlgu0i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

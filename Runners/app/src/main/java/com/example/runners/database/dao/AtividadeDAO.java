@@ -5,9 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-
 import com.example.runners.database.entity.Atividade;
-
 import java.util.List;
 
 @Dao
@@ -18,5 +16,10 @@ public interface AtividadeDAO {
 
     @Query("SELECT * FROM atividade")
     LiveData<List<Atividade>> getAllAtividade();
+
+    @Query("SELECT * FROM atividade WHERE speed=0")
+    LiveData<List<Atividade>> getAtividade();
+
+
 
 }

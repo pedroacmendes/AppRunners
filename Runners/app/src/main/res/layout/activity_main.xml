@@ -1,84 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/aa">
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbarid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/input_group"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:gravity="center" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="SIGN IN"
-            android:textColor="#FFFF"
-            android:textSize="20sp" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/input_group"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabllayout_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
-        android:layout_marginBottom="50dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:background="@color/colorPrimary"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/tabindicatorcolor"
+        app:tabMode="fixed"
+        app:tabTextColor="@color/tabtextColor"/>
 
-        <EditText
-            android:id="@+id/edt_user"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Username"
-            android:textColorHint="#ffff"
-            android:textColor="#ffff"
-            android:inputType="textPersonName"
-            android:padding="15dp" />
+    <androidx.viewpager.widget.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/viewpager_id" />
 
-        <EditText
-            android:id="@+id/edt_pass"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:textColorHint="#ffff"
-            android:textColor="#ffff"
-            android:inputType="textPassword"
-            android:padding="15dp" />
 
-        <Button
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:id="@+id/btn_signIn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="SIGN IN"
-            android:textAllCaps="false"
-            android:textColor="#FFFF"
-            android:textSize="17sp" />
 
-        <TextView
-            android:id="@+id/signUp_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:fontFamily="sans-serif"
-            android:padding="10dp"
-            android:text="Don't have an account?  Sign Up"
-            android:textAllCaps="true"
-            android:textColor="#ffff"
-            android:textSize="13dp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>
