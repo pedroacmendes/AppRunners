@@ -98,13 +98,11 @@ public class MainActivity extends AppCompatActivity implements Cliques {
         transaction.commit();
     }
 
-    public void sendMenssage(int id, int speed, int gps, String time, String data) {
+    public void sendMenssage(int id, long gps, int speed,  String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
 
-        Atividade atividade = new Atividade(id, speed, gps, time, data);
+        Atividade atividade = new Atividade(id, gps, speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
         model.insere(atividade);
-        //mudarFrag3();
-
-
+        mudarFrag3();
 
     }
 

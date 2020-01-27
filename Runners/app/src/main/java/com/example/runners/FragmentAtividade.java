@@ -88,6 +88,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private TextView txtLocation;
     private TextView txtSpeed;
     private TextView txt_kcal;
+    private TextView txtAltitude;
+    private TextView txthoraStart;
     private Button btnBeginAtua;
     private Button btnterminaAtividade;
     private Chronometer ch;
@@ -144,6 +146,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         txtLocation = view.findViewById(R.id.txtLocation);
         txtSpeed = view.findViewById(R.id.txtSpeed);
         txt_kcal = view.findViewById(R.id.txt_kcal);
+        txtAltitude = view.findViewById(R.id.txtAltitude);
+        txthoraStart = view.findViewById(R.id.txthoraStart);
 
         mReceiver = new MyReceiver();
         getContext().registerReceiver(mReceiver, new IntentFilter("acao update"));
@@ -177,12 +181,22 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 for (Location location : locationResult.getLocations()) {
                     Toast.makeText(getActivity(), "Atualizou a localização", Toast.LENGTH_SHORT).show();
                     addMarker(location);
+
                     int calorias = getpassos() / 20;
                     int Speed = (int) ((location.getSpeed() * 3600 / 1000));
-                    txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude() + "\n Altitude: " + location.getAltitude());
+
+                    Date dataHoraAtual = new Date();
+                    String horaStart = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+
+                    txtAltitude.setText(" Altitude:" + location.getAltitude());
+                    txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude());
                     txtSpeed.setText(" Velocidade: " + Speed);
                     nPassos.setText(" Passos: " + getpassos());
                     txt_kcal.setText(" Calorias: " + calorias);
+
+                    //escondido na atividade
+                    txthoraStart.setText(horaStart);
+
                     Geocoder(location);
                 }
             }
@@ -205,13 +219,18 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 stopLocationUpdates();
                 cancelNotificacao();
-                int gps = txtLocation.getText().length();
+
                 int speed = txtSpeed.getText().length();
+                long gps = txtLocation.getText().length();
+                long altitude = txtAltitude.getText().length();
+                int passos = nPassos.getText().length();
+                int calorias = txt_kcal.getText().length();
+                String horaInicio = txthoraStart.getText().toString();
+                String temperatura = txtTemp.getText().toString();
 
                 Date dataHoraAtual = new Date();
                 String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
                 String horaFim = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
-                String horaInicio = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
 
                 milliseconds = SystemClock.elapsedRealtime() - ch.getBase();
                 int seconds = (int) (milliseconds / 1000) % 60;
@@ -220,7 +239,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 String time = "Tempo: " + hours + "h" + minutes + "m" + seconds + "s";
                 ch.stop();
 
-                cliques.sendMenssage(0, speed, gps, time, data);
+                cliques.sendMenssage(0, gps, speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
                 ch.setBase(SystemClock.elapsedRealtime());
             }
         });
@@ -241,7 +260,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                             Toast.makeText(getContext(), "Success!", Toast.LENGTH_LONG).show();
                             addMarker(location);
                             int Speed = (int) ((location.getSpeed() * 3600 / 1000));
-                            txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude() + "\n Altitude: " + location.getAltitude());
+                            txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude());
                             txtSpeed.setText(" Velocidade: " + Speed);
                             Geocoder(location);
                         }
@@ -285,6 +304,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 .add(latLng)
                 .width(8f)
                 .color(Color.RED)
+                .geodesic(true)
         );
 
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));

@@ -60,9 +60,15 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
                     Bundle bundle = new Bundle();
                     bundle.putInt("idAtividade", atividade.getId());
                     bundle.putInt("speedAtividade", atividade.getSpeed());
-                    bundle.putInt("gpsAtividade", atividade.getGps());
+                    bundle.putLong("gpsAtividade", atividade.getGps());
                     bundle.putString("timeAtividade", atividade.getTime());
                     bundle.putString("dataAtividade", atividade.getData());
+                    bundle.putLong("altitudeAtividade", atividade.getAltitude());
+                    bundle.putInt("passosAtividade", atividade.getPassos());
+                    bundle.putInt("caloriasAtividade", atividade.getCalorias());
+                    bundle.putString("horaInicioAtividade", atividade.getHoraInicio());
+                    bundle.putString("horaFimAtividade", atividade.getHoraFim());
+                    bundle.putString("temperaturaAtividade", atividade.getTemperatura());
 
                     FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
                     fragmentDetalhes.setArguments(bundle);

@@ -11,21 +11,37 @@ public class Atividade {
     @NonNull
     private int id;
 
-    private int gps;
+    private long gps;
     private int speed;
     private String time;
     private String data;
+    private long altitude;
+    private int passos;
+    private int calorias;
+    private String horaInicio;
+    private String horaFim;
+    private String temperatura;
 
-    public Atividade(int id, int speed, int gps, String time, String data) {
+    public Atividade(int id, long gps, int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
         this.id = id;
-        this.speed = speed;
         this.gps = gps;
+        this.speed = speed;
         this.time = time;
         this.data = data;
+        this.altitude = altitude;
+        this.passos = passos;
+        this.calorias = calorias;
+        this.horaInicio = horaInicio;
+        this.horaFim = horaFim;
+        this.temperatura = temperatura;
     }
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getData() {
@@ -44,11 +60,11 @@ public class Atividade {
         this.speed = speed;
     }
 
-    public int getGps() {
+    public long getGps() {
         return gps;
     }
 
-    public void setId(int gps) {
+    public void setGps(long gps) {
         this.gps = gps;
     }
 
@@ -60,7 +76,51 @@ public class Atividade {
         this.time = time;
     }
 
+    public long getAltitude() {
+        return altitude;
+    }
 
+    public void setAltitude(long altitude) {
+        this.altitude = altitude;
+    }
 
+    public int getPassos() {
+        return passos;
+    }
 
+    public void setPassos(int passos) {
+        this.passos = passos;
+    }
+
+    public int getCalorias() {
+        return calorias;
+    }
+
+    public void setCalorias(int calorias) {
+        this.calorias = calorias;
+    }
+
+    public String getHoraInicio() {
+        return horaInicio;
+    }
+
+    public void setHoraInicio(String horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public String getHoraFim() {
+        return horaFim;
+    }
+
+    public void setHoraFim(String horaFim) {
+        this.horaFim = horaFim;
+    }
+
+    public String getTemperatura() {
+        return temperatura;
+    }
+
+    public void setTemperatura(String temperatura) {
+        this.temperatura = temperatura;
+    }
 }
