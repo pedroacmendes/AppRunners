@@ -1,12 +1,20 @@
 package com.example.runners.adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.runners.FragmentDetalhes;
 import com.example.runners.R;
 import com.example.runners.database.entity.Atividade;
 
@@ -30,7 +38,7 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
     @Override
     public AtividadeAdapter.AtividadeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View v = inflater.inflate(R.layout.fragment_detalheatividaderecycler, parent, false);
+        View v = inflater.inflate(R.layout.fragment_detalhe_adapter, parent, false);
 
         return new AtividadeHolder(v);
     }
@@ -38,11 +46,32 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
     @Override
     public void onBindViewHolder(@NonNull AtividadeAdapter.AtividadeHolder holder, int position) {
         if (atividades != null) {
-            Atividade atividade = atividades.get(position);
-            holder.a.setText("" + atividade.getSpeed());
-            holder.b.setText("" + atividade.getGps());
-            holder.c.setText("" + atividade.getTime());
-            holder.d.setText("" + atividade.getData());
+            final Atividade atividade = atividades.get(position);
+            holder.time.setText("" + atividade.getTime());
+            holder.data.setText("" + atividade.getData());
+
+            holder.abrir_atividade.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("idAtividade", atividade.getId());
+                    bundle.putInt("speedAtividade", atividade.getSpeed());
+                    bundle.putInt("gpsAtividade", atividade.getGps());
+                    bundle.putString("timeAtividade", atividade.getTime());
+                    bundle.putString("dataAtividade", atividade.getData());
+
+                    FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
+                    fragmentDetalhes.setArguments(bundle);
+
+                    transaction.replace(R.id.container, fragmentDetalhes);
+                    transaction.commit();
+
+                }
+            });
         }
     }
 
@@ -55,14 +84,15 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
 
     class AtividadeHolder extends RecyclerView.ViewHolder {
 
-        TextView a, b, c, d;
+        public TextView time;
+        public TextView data;
+        public Button abrir_atividade;
 
         public AtividadeHolder(@NonNull View itemView) {
             super(itemView);
-            a = itemView.findViewById(R.id.speed);
-            b = itemView.findViewById(R.id.gps);
-            c = itemView.findViewById(R.id.time);
-            d = itemView.findViewById(R.id.data);
+            abrir_atividade = itemView.findViewById(R.id.abrir_atividade);
+            time = itemView.findViewById(R.id.time);
+            data = itemView.findViewById(R.id.data);
         }
     }
 

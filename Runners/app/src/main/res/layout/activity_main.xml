@@ -7,28 +7,64 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbarid"
+    <Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center" />
+        android:layout_height="40dp"
+        android:background="@color/colorPrimary">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/btn_atividade"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Atividade"
+                android:textColor="#FFFFFF"
+                android:textSize="20dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/btn_historico"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Histórico"
+                android:textColor="#FFFFFF"
+                android:textSize="20dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/btn_detalhes"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Detalhes"
+                android:textColor="#FFFFFF"
+                android:paddingRight="10dp"
+                android:textSize="20dp" />
+
+        </LinearLayout>
 
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabllayout_id"
+    </Toolbar>
+
+    <FrameLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/tabindicatorcolor"
-        app:tabMode="fixed"
-        app:tabTextColor="@color/tabtextColor"/>
-
-    <androidx.viewpager.widget.ViewPager
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/viewpager_id" />
-
-
+        android:layout_height="match_parent" />
 
 </LinearLayout>

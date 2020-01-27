@@ -14,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ResetPasswordActivity"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -23,7 +22,6 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyA8BNsNHMouFfCmjbpNziNRejgcPcMtQoc" />
 
-        <activity android:name=".FragmentDetalheAtividadeRecycler" />
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppThemeNoActionBar">
@@ -32,10 +30,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:theme="@style/AppThemeNoActionBar" />
+
         <activity
             android:name=".RegistoActivity"
             android:theme="@style/AppThemeNoActionBar" />
-        <activity android:name=".MainActivity" />
+
+        <activity android:name=".MainActivity"/>
+
     </application>
 
 </manifest>

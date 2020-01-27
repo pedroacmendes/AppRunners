@@ -17,27 +17,46 @@
         android:text="Detalhes da sua corrida:" />
 
     <TextView
-        android:id="@+id/speed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:text="Speed" />
-
-    <TextView
-        android:id="@+id/gps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:text="Gps" />
-
-
-    <TextView
-        android:id="@+id/time"
+        android:id="@+id/txt_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:text="Time" />
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/txt_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"/>
 
 
+    <TextView
+        android:id="@+id/txt_gps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/txt_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/txt_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"/>
+
+    <TextView
+        android:id="@+id/txt_horaInicio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/txt_horaFim"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF" />
 
 </LinearLayout>

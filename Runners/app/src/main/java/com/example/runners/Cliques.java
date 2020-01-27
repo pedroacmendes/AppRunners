@@ -6,6 +6,8 @@ public interface Cliques {
 
     void mudarFrag2();
 
+    void mudarFrag3();
+
     void sendMenssage(int id, int speed, int gps, String time, String data);
 
 }

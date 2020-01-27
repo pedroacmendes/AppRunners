@@ -1,11 +1,17 @@
 package com.example.runners;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,36 +20,27 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.room.Room;
 
 import android.os.SystemClock;
-import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.runners.adapters.AtividadeAdapter;
-import com.example.runners.database.entity.Atividade;
 import com.example.runners.viewModel.AtividadeViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -52,11 +49,11 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -74,10 +71,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.content.Context.SENSOR_SERVICE;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
-public class FragmentAtividade extends Fragment implements OnMapReadyCallback, SensorEventListener {
+public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
     Cliques cliques;
     private GoogleMap mGoogleMap;
@@ -87,34 +85,41 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
     private LocationRequest mLocationRequest;
     private LocationCallback mLocationCallback;
     private Geocoder mGeocoder;
-    private final int ADICIONAR_REQUEST_CODE = 1;
-    private AtividadeViewModel model;
-    private AtividadeAdapter adapter;
     private TextView txtLocation;
     private TextView txtSpeed;
+    private TextView txt_kcal;
     private Button btnBeginAtua;
     private Button btnterminaAtividade;
-    Chronometer ch;
+    private Chronometer ch;
     private long milliseconds;
-    private long millisecondsStop;
+
+    // passos
     private int count = 0;
     private SensorManager mSensorManager;
     private Sensor mDetect;
-    TextView nPassos;
-    Context context;
-
-    //sobre o tempo
-    ImageView imageView = null;
-    TextView txtTemp;
-    TextView txtCidade;
-    Bitmap bitmaps = null;
-    String BaseUrl = "http://api.openweathermap.org/";
-    String AppId = "6001a24cb76e586f7133c5e1272bc6de";
-    public String lat;
-    public String lon;
-    String units = "metric";
+    private TextView nPassos;
     private Context mContext;
 
+    //sobre o tempo
+    private ImageView imageView = null;
+    private TextView txtTemp;
+    private TextView txtCidade;
+    private Bitmap bitmaps = null;
+    private String BaseUrl = "http://api.openweathermap.org/";
+    private String AppId = "6001a24cb76e586f7133c5e1272bc6de";
+    public String lat;
+    public String lon;
+    private String units = "metric";
+
+    //sobre a linha do mapa
+    private Polyline line;
+
+    //notification
+    private static final String CHANNEL_ID = "05";
+    private static final int notificationId = 10;
+    private NotificationCompat.Builder builder;
+    private NotificationManager notificationManager;
+    private MyReceiver mReceiver;
 
     public FragmentAtividade() {
     }
@@ -124,24 +129,31 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
         super.onCreate(savedInstanceState);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_atividade, container, false);
+
+        createNotificationChannel();
+        createNotification();
+
         ch = view.findViewById(R.id.simpleChronometer);
         btnBeginAtua = view.findViewById(R.id.btnBeginAtua);
+        btnBeginAtua.setEnabled(true);
         btnterminaAtividade = view.findViewById(R.id.btn_terminaAtividade);
         txtLocation = view.findViewById(R.id.txtLocation);
         txtSpeed = view.findViewById(R.id.txtSpeed);
+        txt_kcal = view.findViewById(R.id.txt_kcal);
+
+        mReceiver = new MyReceiver();
+        getContext().registerReceiver(mReceiver, new IntentFilter("acao update"));
 
         mSensorManager = (SensorManager) getContext().getSystemService(SENSOR_SERVICE);
         mDetect = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-        mSensorManager.registerListener(this, mDetect, SensorManager.SENSOR_DELAY_FASTEST);
+        //mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
         nPassos = view.findViewById(R.id.nPassos);
 
         milliseconds = 0;
-        millisecondsStop = 0;
 
         mFusedLocationClient = getFusedLocationProviderClient(getContext());
         txtTemp = view.findViewById(R.id.txtTemp);
@@ -165,10 +177,12 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
                 for (Location location : locationResult.getLocations()) {
                     Toast.makeText(getActivity(), "Atualizou a localização", Toast.LENGTH_SHORT).show();
                     addMarker(location);
+                    int calorias = getpassos() / 20;
                     int Speed = (int) ((location.getSpeed() * 3600 / 1000));
                     txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude() + "\n Altitude: " + location.getAltitude());
                     txtSpeed.setText(" Velocidade: " + Speed);
                     nPassos.setText(" Passos: " + getpassos());
+                    txt_kcal.setText(" Calorias: " + calorias);
                     Geocoder(location);
                 }
             }
@@ -177,35 +191,39 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
         btnBeginAtua.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ch.start();
                 startLocationUpdates();
-                nPassos.setText(" Passos: " + getpassos());
+                createNotification();
+                mostrarNotificacao();
+                mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
+                ch.setBase(SystemClock.elapsedRealtime());
+                ch.start();
             }
         });
 
         btnterminaAtividade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 stopLocationUpdates();
-
+                cancelNotificacao();
                 int gps = txtLocation.getText().length();
                 int speed = txtSpeed.getText().length();
+
+                Date dataHoraAtual = new Date();
+                String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
+                String horaFim = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+                String horaInicio = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+
+                milliseconds = SystemClock.elapsedRealtime() - ch.getBase();
                 int seconds = (int) (milliseconds / 1000) % 60;
                 int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
                 int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
-                String time = " Tempo: " + hours + "h" + minutes + "m" + seconds + "s";
-                SimpleDateFormat formataData = new SimpleDateFormat("dd-MM-yyyy");
-                Date date = new Date();
-                String data = formataData.format(date);
-                cliques.sendMenssage(0,speed, gps, time, data);
+                String time = "Tempo: " + hours + "h" + minutes + "m" + seconds + "s";
                 ch.stop();
-                ch.setBase(SystemClock.elapsedRealtime());
 
+                cliques.sendMenssage(0, speed, gps, time, data);
+                ch.setBase(SystemClock.elapsedRealtime());
             }
         });
-
         return view;
     }
 
@@ -258,9 +276,16 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
     public void addMarker(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        mGoogleMap.addMarker(new MarkerOptions()
+       /*mGoogleMap.addMarker(new MarkerOptions()
                 .position(latLng)
-                .title("Atual localização"));
+                .title("Atual localização"));*/
+
+        //se tiver 2 latlng especificas marca uma linha reta
+        mGoogleMap.addPolyline(new PolylineOptions()
+                .add(latLng)
+                .width(8f)
+                .color(Color.RED)
+        );
 
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
     }
@@ -280,60 +305,13 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
     }
 
 
-    public void startChronometer(View v) {
-        millisecondsStop = millisecondsStop > 0 ? System.currentTimeMillis() - millisecondsStop : 0;
-        ch.setBase(SystemClock.elapsedRealtime() - (milliseconds + millisecondsStop));
-        ch.start();
-        millisecondsStop = 0;
-    }
-
-
-    public void pauseChronometer(View v) {
-        millisecondsStop = System.currentTimeMillis();
-        milliseconds = SystemClock.elapsedRealtime() - ch.getBase();
-        ch.stop();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-            cliques = (Cliques) context;
-        } catch (Exception e) {
-            Log.e("onAttach", e.toString());
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        count++;
-        nPassos.setText("" + count);
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    public int getpassos() {
-        return count;
-    }
-
-
     //TUDO SOBRE A TEMPERATURA
-
     private void getLastLocationTemp() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions();
             return;
         }
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(),new OnSuccessListener<Location>() {
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
@@ -386,7 +364,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
                         Toast.makeText(getContext(), "Error", Toast.LENGTH_LONG).show();
                     }
                 });
-
     }
 
     class AsyncTaskExample extends AsyncTask<URL, Integer, Bitmap> {
@@ -395,8 +372,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-
         }
 
         @Override
@@ -421,8 +396,104 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback, S
             super.onProgressUpdate(values);
         }
 
-
     }
 
+
+    //PASSOS
+    public class ProxSensor implements SensorEventListener {
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            count++;
+            nPassos.setText("" + count);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    }
+
+    public int getpassos() {
+        return count;
+    }
+
+
+    //NOTIFICAÇAO
+    private void createNotification() {
+
+        Intent botao = new Intent("acao update");
+        PendingIntent botaoPendingIntent = PendingIntent.getBroadcast(getContext(), 0, botao, PendingIntent.FLAG_ONE_SHOT);
+
+        builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle("Atividade iniciada!")
+                .setContentText("Passos: " + count + "   |   Distancia: 0km")
+                .setUsesChronometer(true)
+                .addAction(R.drawable.ic_stat_name, "Mostar mapa", botaoPendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        Intent resultIntent = new Intent(getContext(), MainActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setContentIntent(resultPendingIntent);
+    }
+
+    private void createNotificationChannel() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void mostrarNotificacao() {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+        notificationManager.notify(notificationId, builder.build());
+    }
+
+    public void alterarNotificao() {
+
+        NotificationCompat.BigPictureStyle bpStyle = new NotificationCompat.BigPictureStyle();
+        bpStyle.bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.mascot_1)).build();
+        builder.setStyle(bpStyle);
+        //builder.setContentTitle("Atividade com mapa");
+        mostrarNotificacao();
+    }
+
+    public void cancelNotificacao() {
+        NotificationManager mNotifyMgr = (NotificationManager) getContext().getSystemService(NOTIFICATION_SERVICE);
+        mNotifyMgr.cancel(notificationId);
+    }
+
+    private class MyReceiver extends BroadcastReceiver {
+        public void onReceive(Context context, Intent intent) {
+            alterarNotificao();
+        }
+    }
+
+
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            cliques = (Cliques) context;
+        } catch (Exception e) {
+            Log.e("onAttach", e.toString());
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
 
 }

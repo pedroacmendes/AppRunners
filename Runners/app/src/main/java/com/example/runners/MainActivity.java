@@ -1,52 +1,77 @@
 package com.example.runners;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.viewpager.widget.ViewPager;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toolbar;
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.viewModel.AtividadeViewModel;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends FragmentActivity implements Cliques {
+public class MainActivity extends AppCompatActivity implements Cliques {
 
     private AtividadeViewModel model;
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-    private AppBarLayout appBarLayout;
+    private Toolbar toolbar;
+    TextView btn_historico;
+    TextView btn_atividade;
+    TextView btn_detalhes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabllayout_id);
-        appBarLayout = (AppBarLayout) findViewById(R.id.appbarid);
-        viewPager = (ViewPager) findViewById(R.id.viewpager_id);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        btn_historico = findViewById(R.id.btn_historico);
+        btn_atividade = findViewById(R.id.btn_atividade);
+        btn_detalhes = findViewById(R.id.btn_detalhes);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        btn_atividade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mudarFrag();
+            }
+        });
 
-        adapter.AddFragment(new FragmentAtividade(), "Atividade");
-        adapter.AddFragment(new FragmentHistorico(), "Histórico");
-        adapter.AddFragment(new FragmentDetalhes(), "Detalhes");
+        btn_historico.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mudarFrag2();
+            }
+        });
 
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
+        btn_detalhes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mudarFrag3();
+            }
+        });
+
+        mudarFrag();
 
         model = ViewModelProviders.of(this).get(AtividadeViewModel.class);
     }
 
     @Override
     public void mudarFrag() {
+
+        FragmentAtividade FragmentAtividade = new FragmentAtividade();
+
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+
+        transaction.replace(R.id.container, FragmentAtividade);
+        transaction.addToBackStack(null);
+
+        transaction.commit();
+    }
+
+    @Override
+    public void mudarFrag2() {
 
         FragmentHistorico FragmentHistorico = new FragmentHistorico();
 
@@ -60,51 +85,26 @@ public class MainActivity extends FragmentActivity implements Cliques {
     }
 
     @Override
-    public void mudarFrag2() {
+    public void mudarFrag3() {
 
-        FragmentDetalhes FragmentDetalhes = new FragmentDetalhes();
+        FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
 
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
 
-        transaction.replace(R.id.container, FragmentDetalhes);
+        transaction.replace(R.id.container, fragmentDetalhes);
         transaction.addToBackStack(null);
 
         transaction.commit();
     }
 
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_historico:
-                Intent intent = new Intent(this, FragmentHistorico.class);
-                startActivity(intent);
-                break;
-            case R.id.action_sair:
-                Intent intent2 = new Intent(this, LoginActivity.class);
-                startActivity(intent2);
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void sendMenssage(int id,int speed, int gps, String time, String data) {
+    public void sendMenssage(int id, int speed, int gps, String time, String data) {
 
         Atividade atividade = new Atividade(id, speed, gps, time, data);
         model.insere(atividade);
+        //mudarFrag3();
+
+
 
     }
 

@@ -46,9 +46,16 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class FragmentDetalhes extends Fragment {
 
-    private AtividadeAdapter adapter;
-    private AtividadeViewModel model;
-    private Context mContext;
+    TextView txt_id;
+    TextView txt_speed;
+    TextView txt_gps;
+    TextView txt_time;
+    TextView txt_data;
+
+
+
+
+    Context mContext;
 
     public FragmentDetalhes() {
     }
@@ -67,14 +74,23 @@ public class FragmentDetalhes extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detalhes, container, false);
 
 
-        adapter = new AtividadeAdapter(getContext());
-        model = ViewModelProviders.of(this).get(AtividadeViewModel.class);
-        model.getAtividade().observe(this, new Observer<List<Atividade>>() {
-            @Override
-            public void onChanged(List<Atividade> atividade) {
-                adapter.setAtividades(atividade);
-            }
-        });
+        txt_id = view.findViewById(R.id.txt_id);
+        txt_speed = view.findViewById(R.id.txt_speed);
+        txt_gps = view.findViewById(R.id.txt_gps);
+        txt_time = view.findViewById(R.id.txt_time);
+        txt_data = view.findViewById(R.id.txt_data);
+
+        int idAtividade = getArguments().getInt("idAtividade");
+        int speedAtividade = getArguments().getInt("speedAtividade");
+        int gpsAtividade = getArguments().getInt("gpsAtividade");
+        String timeAtividade = getArguments().getString("timeAtividade");
+        String dataAtividade = getArguments().getString("dataAtividade");
+
+        txt_id.setText("ID: " + idAtividade);
+        txt_speed.setText("Velocidade: " + speedAtividade);
+        txt_gps.setText("Gps: " + gpsAtividade);
+        txt_time.setText(timeAtividade);
+        txt_data.setText("Data: " + dataAtividade);
 
         return view;
     }
