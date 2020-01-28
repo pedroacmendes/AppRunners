@@ -9,12 +9,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toolbar;
 import com.example.runners.database.entity.Atividade;
+import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
+import com.example.runners.viewModel.LocalizationsViewModel;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity implements Cliques {
 
-    private AtividadeViewModel model;
     private Toolbar toolbar;
     TextView btn_historico;
     TextView btn_atividade;
@@ -53,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements Cliques {
 
         mudarFrag();
 
-        model = ViewModelProviders.of(this).get(AtividadeViewModel.class);
     }
 
     @Override
@@ -97,15 +97,6 @@ public class MainActivity extends AppCompatActivity implements Cliques {
 
         transaction.commit();
     }
-
-    public void sendMenssage(int id, long gps, int speed,  String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
-
-        Atividade atividade = new Atividade(id, gps, speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
-        model.insere(atividade);
-        mudarFrag3();
-
-    }
-
 
 }
 

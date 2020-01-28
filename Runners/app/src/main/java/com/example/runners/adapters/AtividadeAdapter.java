@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.runners.FragmentDetalhes;
 import com.example.runners.R;
 import com.example.runners.database.entity.Atividade;
+import com.example.runners.database.entity.Localizations;
 
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
     public void onBindViewHolder(@NonNull AtividadeAdapter.AtividadeHolder holder, int position) {
         if (atividades != null) {
             final Atividade atividade = atividades.get(position);
+
             holder.time.setText("" + atividade.getTime());
             holder.data.setText("" + atividade.getData());
 
@@ -60,7 +62,6 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
                     Bundle bundle = new Bundle();
                     bundle.putInt("idAtividade", atividade.getId());
                     bundle.putInt("speedAtividade", atividade.getSpeed());
-                    bundle.putLong("gpsAtividade", atividade.getGps());
                     bundle.putString("timeAtividade", atividade.getTime());
                     bundle.putString("dataAtividade", atividade.getData());
                     bundle.putLong("altitudeAtividade", atividade.getAltitude());
@@ -79,6 +80,8 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
                 }
             });
         }
+
+
     }
 
     @Override

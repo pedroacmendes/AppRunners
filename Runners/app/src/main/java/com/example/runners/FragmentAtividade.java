@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -28,6 +29,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.os.SystemClock;
 import android.util.Log;
@@ -41,7 +44,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.runners.adapters.AtividadeAdapter;
+import com.example.runners.database.entity.Atividade;
+import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
+import com.example.runners.viewModel.LocalizationsViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -51,11 +57,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.w3c.dom.DOMImplementation;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -95,6 +106,9 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private Chronometer ch;
     private long milliseconds;
 
+    LocalizationsViewModel localizationsViewModel;
+    AtividadeViewModel atividadeViewModel;
+
     // passos
     private int count = 0;
     private SensorManager mSensorManager;
@@ -113,8 +127,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     public String lon;
     private String units = "metric";
 
-    //sobre a linha do mapa
-    private Polyline line;
+    public PolylineOptions line = new PolylineOptions()
+            .color(Color.RED);
 
     //notification
     private static final String CHANNEL_ID = "05";
@@ -123,12 +137,10 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private NotificationManager notificationManager;
     private MyReceiver mReceiver;
 
-    public FragmentAtividade() {
-    }
+    Atividade ultimaAtividade;
+    Atividade primeiraAtividade;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public FragmentAtividade() {
     }
 
     @Override
@@ -182,11 +194,17 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getActivity(), "Atualizou a localização", Toast.LENGTH_SHORT).show();
                     addMarker(location);
 
+                    int i = 0;
                     int calorias = getpassos() / 20;
                     int Speed = (int) ((location.getSpeed() * 3600 / 1000));
 
                     Date dataHoraAtual = new Date();
                     String horaStart = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putDouble("gpsLatitude", location.getLatitude());
+                    bundle.putDouble("gpsLongitude", location.getLongitude());
+                    setArguments(bundle);
 
                     txtAltitude.setText(" Altitude:" + location.getAltitude());
                     txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude());
@@ -194,8 +212,30 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                     nPassos.setText(" Passos: " + getpassos());
                     txt_kcal.setText(" Calorias: " + calorias);
 
-                    //escondido na atividade
-                    txthoraStart.setText(horaStart);
+                    if (txthoraStart.getText().toString().matches("")) {
+                        txthoraStart.setText(horaStart);
+                    }
+
+                    final double latitude = location.getLatitude();
+                    final double longitude = location.getLongitude();
+
+                    localizationsViewModel = ViewModelProviders.of(getActivity()).get(LocalizationsViewModel.class);
+                    atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
+
+                    atividadeViewModel.getAllAtividade().observe(getActivity(), new Observer<List<Atividade>>() {
+                        @Override
+                        public void onChanged(List<Atividade> atividades) {
+
+                                ultimaAtividade = atividades.get(atividades.size() - 1);
+
+                                Localizations l = new Localizations(0, ultimaAtividade.getId(), latitude, longitude);
+                                localizationsViewModel.insere(l);
+
+                        }
+                    });
+
+                    LatLng latLng = new LatLng(latitude, longitude);
+                    line.add(latLng);
 
                     Geocoder(location);
                 }
@@ -210,6 +250,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 mostrarNotificacao();
                 mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
                 ch.setBase(SystemClock.elapsedRealtime());
+
                 ch.start();
             }
         });
@@ -221,7 +262,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 cancelNotificacao();
 
                 int speed = txtSpeed.getText().length();
-                long gps = txtLocation.getText().length();
                 long altitude = txtAltitude.getText().length();
                 int passos = nPassos.getText().length();
                 int calorias = txt_kcal.getText().length();
@@ -236,15 +276,22 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 int seconds = (int) (milliseconds / 1000) % 60;
                 int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
                 int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
-                String time = "Tempo: " + hours + "h" + minutes + "m" + seconds + "s";
+                String time = hours + "h " + minutes + "m " + seconds + "s";
                 ch.stop();
 
-                cliques.sendMenssage(0, gps, speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
+                atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
+                Atividade atividade = new Atividade(0, speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
+                atividadeViewModel.insere(atividade);
+
                 ch.setBase(SystemClock.elapsedRealtime());
+
+                cliques.mudarFrag3();
+
             }
         });
         return view;
     }
+
 
     private void getLastLocation() {
         if (ActivityCompat.checkSelfPermission(getContext(),
@@ -294,19 +341,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
     public void addMarker(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-       /*mGoogleMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title("Atual localização"));*/
-
-        //se tiver 2 latlng especificas marca uma linha reta
-        mGoogleMap.addPolyline(new PolylineOptions()
-                .add(latLng)
-                .width(8f)
-                .color(Color.RED)
-                .geodesic(true)
-        );
-
+        mGoogleMap.addPolyline(line);
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
     }
 
@@ -496,8 +531,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
             alterarNotificao();
         }
     }
-
-
 
 
     @Override

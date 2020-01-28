@@ -17,9 +17,7 @@ public interface AtividadeDAO {
     @Query("SELECT * FROM atividade")
     LiveData<List<Atividade>> getAllAtividade();
 
-    @Query("SELECT * FROM atividade WHERE speed=0")
+    @Query("SELECT * FROM atividade WHERE speed = 0")
     LiveData<List<Atividade>> getAtividade();
-
-
 
 }

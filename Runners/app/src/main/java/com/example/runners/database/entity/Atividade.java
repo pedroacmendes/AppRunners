@@ -11,7 +11,6 @@ public class Atividade {
     @NonNull
     private int id;
 
-    private long gps;
     private int speed;
     private String time;
     private String data;
@@ -22,9 +21,8 @@ public class Atividade {
     private String horaFim;
     private String temperatura;
 
-    public Atividade(int id, long gps, int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
+    public Atividade(int id, int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
         this.id = id;
-        this.gps = gps;
         this.speed = speed;
         this.time = time;
         this.data = data;
@@ -58,14 +56,6 @@ public class Atividade {
 
     public void setSpeed(int speed) {
         this.speed = speed;
-    }
-
-    public long getGps() {
-        return gps;
-    }
-
-    public void setGps(long gps) {
-        this.gps = gps;
     }
 
     public String getTime() {

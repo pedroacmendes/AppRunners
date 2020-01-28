@@ -10,14 +10,17 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.runners.database.dao.AtividadeDAO;
+import com.example.runners.database.dao.LocalizationsDAO;
 import com.example.runners.database.entity.Atividade;
+import com.example.runners.database.entity.Localizations;
 
-@Database(entities = {Atividade.class}, version = 1, exportSchema = false)
+@Database(entities = {Atividade.class, Localizations.class}, version = 1, exportSchema = false)
 public abstract class AtividadeDatabase extends RoomDatabase {
 
     private static AtividadeDatabase INSTANCE;
 
     public abstract AtividadeDAO atividadeDao();
+    public abstract LocalizationsDAO localizationsDAO();
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
