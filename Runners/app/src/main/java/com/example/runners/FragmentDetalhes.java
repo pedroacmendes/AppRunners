@@ -121,20 +121,11 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         txt_calorias = view.findViewById(R.id.txt_calorias);
         txt_distancia = view.findViewById(R.id.txt_distancia);
 
+
         if (getArguments() == null) {
 
-            //Atividade ultimaAtividade = ativida.get(ativida.size() -1);
-
-            txt_titulo.setText("Detalhes de caminhada: ");
-        /*  txt_speed.setText("Velocidade: " + ultimaAtividade.getSpeed());
-            txt_time.setText(ultimaAtividade.getTime());
-            txt_data.setText("Data: " + ultimaAtividade.getData());
-            txt_altitude.setText("Altitude: " + ultimaAtividade.getAltitude());
-            txt_passos.setText("Passos:" + ultimaAtividade.getPassos());
-            txt_calorias.setText("Calorias: " + ultimaAtividade.getCalorias());
-            txt_horaInicio.setText("Hora inicio:" + ultimaAtividade.getHoraInicio());
-            txt_horaFim.setText("Hora fim: " + ultimaAtividade.getHoraFim());
-            txt_temperatura.setText("Temperatura que estava: " + ultimaAtividade.getTemperatura());*/
+            txt_titulo.setText("Sem caminhadas ralizadas :(");
+            //txt_titulo.setText("Detalhes de caminhada: ");
 
         } else {
 
@@ -160,13 +151,12 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                             addMarker(lat, lon, 1);
                             double lat2 = lat;
                             double lon2 = lon;
-                           // calculaDistancia(lat1, lon1, lat2, lon2);
+                            // calculaDistancia(lat1, lon1, lat2, lon2);
                         } else {
                             addMarker(lat, lon, 2);
                         }
                         LatLng latLng = new LatLng(lat, lon);
                         line.add(latLng);
-
                     }
                 }
             });
@@ -182,13 +172,26 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
             txt_titulo.setText("Detalhes de caminhada: " + idAtividade);
             txt_speed.setText("" + speedAtividade);
             txt_time.setText(timeAtividade);
-            txt_subTitulo.setText("Dia " + dataAtividade + ", as " + getArguments().getString("horaInicioAtividade") + " com " + temperaturaAtividade + " de temperatura." );
+            txt_subTitulo.setText("Dia " + dataAtividade + ", as " + getArguments().getString("horaInicioAtividade") + " com " + temperaturaAtividade + " de temperatura.");
             txt_altitude.setText("" + altitudeAtividade);
             txt_passos.setText("" + passosAtividade);
             txt_calorias.setText("" + caloriasAtividade);
         }
+
+
+
+        /*  txt_speed.setText("Velocidade: " + ultimaAtividade.getSpeed());
+            txt_time.setText(ultimaAtividade.getTime());
+            txt_data.setText("Data: " + ultimaAtividade.getData());
+            txt_altitude.setText("Altitude: " + ultimaAtividade.getAltitude());
+            txt_passos.setText("Passos:" + ultimaAtividade.getPassos());
+            txt_calorias.setText("Calorias: " + ultimaAtividade.getCalorias());
+            txt_horaInicio.setText("Hora inicio:" + ultimaAtividade.getHoraInicio());
+            txt_horaFim.setText("Hora fim: " + ultimaAtividade.getHoraFim());
+            txt_temperatura.setText("Temperatura que estava: " + ultimaAtividade.getTemperatura());*/
+
         return view;
-    }
+}
 
     public void onMapReady(GoogleMap map) {
         mGoogleMap = map;

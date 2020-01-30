@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity implements Cliques {
     TextView btn_historico;
     TextView btn_atividade;
     TextView btn_detalhes;
+    private boolean isSmatphone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,14 @@ public class MainActivity extends AppCompatActivity implements Cliques {
         btn_historico = findViewById(R.id.btn_historico);
         btn_atividade = findViewById(R.id.btn_atividade);
         btn_detalhes = findViewById(R.id.btn_detalhes);
+
+        if (findViewById(R.id.container) != null) {
+            isSmatphone = true;
+        } else {
+            isSmatphone = false;
+        }
+
+        mudarFrag();
 
         btn_atividade.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,36 +61,73 @@ public class MainActivity extends AppCompatActivity implements Cliques {
             }
         });
 
-        mudarFrag();
+
 
     }
 
     @Override
     public void mudarFrag() {
 
-        FragmentAtividade FragmentAtividade = new FragmentAtividade();
+        if(isSmatphone){
+            FragmentAtividade FragmentAtividade = new FragmentAtividade();
 
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
 
-        transaction.replace(R.id.container, FragmentAtividade);
-        transaction.addToBackStack(null);
+            transaction.replace(R.id.container, FragmentAtividade);
+            transaction.addToBackStack(null);
 
-        transaction.commit();
+            transaction.commit();
+        } else{
+            FragmentHistorico FragmentHistorico = new FragmentHistorico();
+            FragmentAtividade FragmentAtividade = new FragmentAtividade();
+
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            FragmentManager manager2 = getSupportFragmentManager();
+            FragmentTransaction transaction2 = manager2.beginTransaction();
+
+            transaction.replace(R.id.fragment, FragmentHistorico);
+            transaction2.replace(R.id.fragment2, FragmentAtividade);
+
+            transaction.addToBackStack(null);
+            transaction2.addToBackStack(null);
+
+            transaction.commit();
+            transaction2.commit();
+        }
+
     }
 
     @Override
     public void mudarFrag2() {
 
-        FragmentHistorico FragmentHistorico = new FragmentHistorico();
 
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
+        if(isSmatphone){
+            FragmentHistorico FragmentHistorico = new FragmentHistorico();
 
-        transaction.replace(R.id.container, FragmentHistorico);
-        transaction.addToBackStack(null);
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
 
-        transaction.commit();
+            transaction.replace(R.id.container, FragmentHistorico);
+            transaction.addToBackStack(null);
+
+            transaction.commit();
+        } else {
+            FragmentHistorico FragmentHistorico = new FragmentHistorico();
+            FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
+
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+
+            transaction.replace(R.id.fragment, FragmentHistorico);
+            transaction.replace(R.id.fragment2, fragmentDetalhes);
+            transaction.addToBackStack(null);
+
+            transaction.commit();
+        }
+
+
     }
 
     @Override

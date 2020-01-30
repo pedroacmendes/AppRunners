@@ -25,6 +25,10 @@ public class AtividadeRepository {
         new InsertAsync(atividadeDAO).execute(a);
     }
 
+    public void updateAtividade(int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura, int id){
+        atividadeDAO.update(speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura, id);
+    }
+
     public LiveData<List<Atividade>> getAllAtividades(){
         return allAtividades;
     }
@@ -47,5 +51,6 @@ public class AtividadeRepository {
             return null;
         }
     }
+
 
 }

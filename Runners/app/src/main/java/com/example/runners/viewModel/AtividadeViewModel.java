@@ -33,4 +33,8 @@ public class AtividadeViewModel extends AndroidViewModel {
         repository.insereAtividade(atividade);
     }
 
+    public void update (int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura, int id){
+        repository.updateAtividade(speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura, id);
+    }
+
 }
