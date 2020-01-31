@@ -81,8 +81,7 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
     LiveData<List<Localizations>> Locais;
     List<Localizations> coordenadas;
 
-    LiveData<List<Atividade>> Ativi;
-    List<Atividade> ativida;
+    Atividade ultimaAtividade;
 
     LocalizationsViewModel localizationsViewModel;
     AtividadeViewModel atividadeViewModel;
@@ -121,11 +120,59 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         txt_calorias = view.findViewById(R.id.txt_calorias);
         txt_distancia = view.findViewById(R.id.txt_distancia);
 
+        if(getArguments() == null){
 
-        if (getArguments() == null) {
+            atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
 
-            txt_titulo.setText("Sem caminhadas ralizadas :(");
-            //txt_titulo.setText("Detalhes de caminhada: ");
+            atividadeViewModel.getAllAtividade().observe(getActivity(), new Observer<List<Atividade>>() {
+                @Override
+                public void onChanged(List<Atividade> atividades) {
+
+                    if (atividades.size() == 0) {
+                        txt_titulo.setText("Sem caminhadas realizadas");
+                    } else {
+                        ultimaAtividade = atividades.get(atividades.size() - 1);
+                        txt_titulo.setText("Detalhes de caminhada: " + ultimaAtividade.getId());
+                        txt_speed.setText("" + ultimaAtividade.getSpeed());
+                        txt_time.setText(ultimaAtividade.getTime());
+                        txt_subTitulo.setText("Dia " + ultimaAtividade.getData() + ", as " + ultimaAtividade.getHoraInicio() + " com " + ultimaAtividade.getTemperatura() + " de temperatura.");
+                        txt_altitude.setText(" " + ultimaAtividade.getAltitude());
+                        txt_passos.setText("" + ultimaAtividade.getPassos());
+                        txt_calorias.setText("" + ultimaAtividade.getCalorias());
+
+                        atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
+                        localizationsViewModel = ViewModelProviders.of(getActivity()).get(LocalizationsViewModel.class);
+
+                        Locais = localizationsViewModel.getLocalizationById(ultimaAtividade.getId());
+                        Locais.observe(getActivity(), new Observer<List<Localizations>>() {
+                            @Override
+                            public void onChanged(List<Localizations> localizations) {
+                                coordenadas = localizations;
+                                for (int i = 0; i <= coordenadas.size() - 1; i++) {
+                                    Localizations l = coordenadas.get(i);
+                                    double lat = l.getLatitude();
+                                    double lon = l.getLongitude();
+                                    /*if (i == 0) {
+                                        addMarker(lat, lon, 0);
+                                        double lat1 = lat;
+                                        double lon1 = lon;
+                                    } else if (i == coordenadas.size() - 1) {
+                                        addMarker(lat, lon, 1);
+                                        double lat2 = lat;
+                                        double lon2 = lon;
+                                        // calculaDistancia(lat1, lon1, lat2, lon2);
+                                    } else {
+                                        addMarker(lat, lon, 2);
+                                    }*/
+                                    LatLng latLng = new LatLng(lat, lon);
+                                    line.add(latLng);
+                                }
+                            }
+                        });
+
+                    }
+                }
+            });
 
         } else {
 
@@ -176,19 +223,8 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
             txt_altitude.setText("" + altitudeAtividade);
             txt_passos.setText("" + passosAtividade);
             txt_calorias.setText("" + caloriasAtividade);
+
         }
-
-
-
-        /*  txt_speed.setText("Velocidade: " + ultimaAtividade.getSpeed());
-            txt_time.setText(ultimaAtividade.getTime());
-            txt_data.setText("Data: " + ultimaAtividade.getData());
-            txt_altitude.setText("Altitude: " + ultimaAtividade.getAltitude());
-            txt_passos.setText("Passos:" + ultimaAtividade.getPassos());
-            txt_calorias.setText("Calorias: " + ultimaAtividade.getCalorias());
-            txt_horaInicio.setText("Hora inicio:" + ultimaAtividade.getHoraInicio());
-            txt_horaFim.setText("Hora fim: " + ultimaAtividade.getHoraFim());
-            txt_temperatura.setText("Temperatura que estava: " + ultimaAtividade.getTemperatura());*/
 
         return view;
 }
@@ -236,7 +272,6 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
 
         return dist * 1000; //em metros
     }
-
 
     @Override
     public void onAttach(Context context) {

@@ -29,6 +29,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -46,6 +49,7 @@ import android.widget.Toast;
 import com.example.runners.adapters.AtividadeAdapter;
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
+import com.example.runners.repository.LocalizationsRepository;
 import com.example.runners.viewModel.AtividadeViewModel;
 import com.example.runners.viewModel.LocalizationsViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -108,6 +112,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private long milliseconds;
 
     LocalizationsViewModel localizationsViewModel;
+    LocalizationsRepository localizationsRepository;
     AtividadeViewModel atividadeViewModel;
 
     // passos
@@ -191,6 +196,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
             public void onLocationResult(LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     Toast.makeText(getActivity(), "Atualizou a localização", Toast.LENGTH_SHORT).show();
+
                     addMarker(location);
 
                     mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
@@ -208,8 +214,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                     bundle.putInt("passos", getpassos());
                     bundle.putDouble("altitude", location.getAltitude());
                     setArguments(bundle);
-
-                    //txt_kcal.setCompoundDrawablesWithIntrinsicBounds(R.mipmap.ic_calorias, 0, 0, 0);
 
                     txtAltitude.setText(" Altitude:" + location.getAltitude());
                     txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude());
@@ -230,7 +234,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                     atividadeViewModel.getAllAtividade().observe(getActivity(), new Observer<List<Atividade>>() {
                         @Override
                         public void onChanged(List<Atividade> atividades) {
-
                             if(atividades.size() == 0){
                                 Localizations l = new Localizations(0, 1, latitude, longitude);
                                 localizationsViewModel.insere(l);
@@ -239,7 +242,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                                 Localizations l = new Localizations(0, ultimaAtividade.getId(), latitude, longitude);
                                 localizationsViewModel.insere(l);
                             }
-
                         }
                     });
 
@@ -258,14 +260,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 createNotification();
                 mostrarNotificacao();
                 ch.setBase(SystemClock.elapsedRealtime());
-
                 mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
-
-                /*int id = atividade.getId();
-                Bundle bundle = new Bundle();
-                bundle.putInt("id", id);
-                setArguments(bundle);*/
-
                 ch.start();
             }
         });
@@ -295,23 +290,19 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 String time = hours + "h " + minutes + "m " + seconds + "s";
                 ch.stop();
 
-               /* int id = getArguments().getInt("id");
-                atividadeViewModel.update(speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura, id);
-*/
-
                 atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
 
                 Atividade atividade = new Atividade(0,speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
 
                 atividadeViewModel.insere(atividade);
 
-
                 ch.setBase(SystemClock.elapsedRealtime());
 
                 cliques.mudarFrag3();
 
             }
-        });
+        }
+        );
         return view;
     }
 
@@ -346,6 +337,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
     private void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        mFusedLocationClient = null;
+        mLocationCallback = null;
     }
 
     public void Geocoder(Location location) {

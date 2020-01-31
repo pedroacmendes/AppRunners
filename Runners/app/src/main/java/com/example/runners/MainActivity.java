@@ -4,10 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toolbar;
+
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements Cliques {
 
         mudarFrag();
 
-        btn_atividade.setOnClickListener(new View.OnClickListener() {
+       btn_atividade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mudarFrag();
@@ -62,13 +64,12 @@ public class MainActivity extends AppCompatActivity implements Cliques {
         });
 
 
-
     }
 
     @Override
     public void mudarFrag() {
 
-        if(isSmatphone){
+        if (isSmatphone) {
             FragmentAtividade FragmentAtividade = new FragmentAtividade();
 
             FragmentManager manager = getSupportFragmentManager();
@@ -78,23 +79,17 @@ public class MainActivity extends AppCompatActivity implements Cliques {
             transaction.addToBackStack(null);
 
             transaction.commit();
-        } else{
-            FragmentHistorico FragmentHistorico = new FragmentHistorico();
+        } else {
             FragmentAtividade FragmentAtividade = new FragmentAtividade();
 
             FragmentManager manager = getSupportFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
-            FragmentManager manager2 = getSupportFragmentManager();
-            FragmentTransaction transaction2 = manager2.beginTransaction();
 
-            transaction.replace(R.id.fragment, FragmentHistorico);
-            transaction2.replace(R.id.fragment2, FragmentAtividade);
+            transaction.replace(R.id.fragment, FragmentAtividade);
 
             transaction.addToBackStack(null);
-            transaction2.addToBackStack(null);
 
             transaction.commit();
-            transaction2.commit();
         }
 
     }
@@ -102,8 +97,7 @@ public class MainActivity extends AppCompatActivity implements Cliques {
     @Override
     public void mudarFrag2() {
 
-
-        if(isSmatphone){
+        if (isSmatphone) {
             FragmentHistorico FragmentHistorico = new FragmentHistorico();
 
             FragmentManager manager = getSupportFragmentManager();
@@ -120,28 +114,41 @@ public class MainActivity extends AppCompatActivity implements Cliques {
             FragmentManager manager = getSupportFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
 
-            transaction.replace(R.id.fragment, FragmentHistorico);
+            transaction.replace(R.id.fragment1, FragmentHistorico);
             transaction.replace(R.id.fragment2, fragmentDetalhes);
+
             transaction.addToBackStack(null);
 
             transaction.commit();
         }
-
-
     }
 
     @Override
     public void mudarFrag3() {
 
-        FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
+        if (isSmatphone) {
+            FragmentDetalhes FragmentDetalhes = new FragmentDetalhes();
 
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
 
-        transaction.replace(R.id.container, fragmentDetalhes);
-        transaction.addToBackStack(null);
+            transaction.replace(R.id.container, FragmentDetalhes);
+            transaction.addToBackStack(null);
 
-        transaction.commit();
+            transaction.commit();
+        } else {
+            FragmentHistorico FragmentHistorico = new FragmentHistorico();
+            FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
+
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+
+            transaction.replace(R.id.fragment1, FragmentHistorico);
+            transaction.replace(R.id.fragment2, fragmentDetalhes);
+            transaction.addToBackStack(null);
+
+            transaction.commit();
+        }
     }
 
 }

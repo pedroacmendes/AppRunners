@@ -21,24 +21,26 @@ import com.example.runners.database.entity.Localizations;
 
 import java.util.List;
 
-public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.AtividadeHolder> {
+import static android.media.CamcorderProfile.get;
 
-    private List<Atividade> atividades;
+public class LocalizationAdapter extends RecyclerView.Adapter<LocalizationAdapter.LocalizationHolder>  {
+
+    private List<Localizations> localizations;
     private Context mContext;
     private boolean isSmatphone;
 
-    public AtividadeAdapter(Context context) {
+    public LocalizationAdapter(Context context) {
         this.mContext = context;
     }
 
-    public void setAtividades(List<Atividade> atividades) {
-        this.atividades = atividades;
+    public void setLocalizations(List<Localizations> localizations) {
+        this.localizations = localizations;
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public AtividadeAdapter.AtividadeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public LocalizationAdapter.LocalizationHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View v = inflater.inflate(R.layout.fragment_detalhe_adapter, parent, false);
 
@@ -47,16 +49,17 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
         } else {
             isSmatphone = false;
         }
-        return new AtividadeHolder(v);
+
+        return new LocalizationHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AtividadeAdapter.AtividadeHolder holder, int position) {
-        if (atividades != null) {
-            final Atividade atividade = atividades.get(position);
+    public void onBindViewHolder(@NonNull LocalizationAdapter.LocalizationHolder holder, int position) {
+        if (localizations != null) {
+            final Localizations localization = localizations.get(position);
 
-            holder.time.setText("" + atividade.getTime());
-            holder.data.setText("" + atividade.getData());
+            holder.time.setText("" + localization.getId());
+            holder.data.setText("" + localization.getIdAtividade());
 
             holder.abrir_atividade.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -65,26 +68,13 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
                     FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("idAtividade", atividade.getId());
-                    bundle.putInt("speedAtividade", atividade.getSpeed());
-                    bundle.putString("timeAtividade", atividade.getTime());
-                    bundle.putString("dataAtividade", atividade.getData());
-                    bundle.putLong("altitudeAtividade", atividade.getAltitude());
-                    bundle.putInt("passosAtividade", atividade.getPassos());
-                    bundle.putInt("caloriasAtividade", atividade.getCalorias());
-                    bundle.putString("horaInicioAtividade", atividade.getHoraInicio());
-                    bundle.putString("horaFimAtividade", atividade.getHoraFim());
-                    bundle.putString("temperaturaAtividade", atividade.getTemperatura());
-
                     FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
-                    fragmentDetalhes.setArguments(bundle);
 
-                    //if(isSmatphone){
+                    if(isSmatphone){
                         transaction.replace(R.id.container, fragmentDetalhes);
-                    /*} else {
+                    } else {
                         transaction.replace(R.id.fragment2, fragmentDetalhes);
-                    }*/
+                    }
 
                     transaction.commit();
 
@@ -92,22 +82,23 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
             });
         }
 
+
     }
 
     @Override
     public int getItemCount() {
-        if (atividades != null)
-            return atividades.size();
+        if (localizations != null)
+            return localizations.size();
         return 0;
     }
 
-    class AtividadeHolder extends RecyclerView.ViewHolder {
+    class LocalizationHolder extends RecyclerView.ViewHolder {
 
         public TextView time;
         public TextView data;
         public Button abrir_atividade;
 
-        public AtividadeHolder(@NonNull View itemView) {
+        public LocalizationHolder(@NonNull View itemView) {
             super(itemView);
             abrir_atividade = itemView.findViewById(R.id.abrir_atividade);
             time = itemView.findViewById(R.id.time);

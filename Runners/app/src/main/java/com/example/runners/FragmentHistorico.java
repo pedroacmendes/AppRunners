@@ -13,15 +13,23 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.runners.adapters.AtividadeAdapter;
+import com.example.runners.adapters.LocalizationAdapter;
 import com.example.runners.database.entity.Atividade;
+import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
+import com.example.runners.viewModel.LocalizationsViewModel;
+
 import java.util.List;
 
 public class FragmentHistorico extends Fragment {
 
+    private Context mContext;
+
     private AtividadeAdapter adapter;
     private AtividadeViewModel model;
-    private Context mContext;
+
+    private LocalizationAdapter adapter2;
+    private LocalizationsViewModel model2;
 
     public FragmentHistorico() {
     }
@@ -35,6 +43,25 @@ public class FragmentHistorico extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_historico, container, false);
+
+        //APARECER TABELA LOCALIZATIONS
+
+        /*RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
+        adapter2 = new LocalizationAdapter(getContext());
+        recyclerView.setAdapter(adapter2);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        model2 = ViewModelProviders.of(this).get(LocalizationsViewModel.class);
+        model2.getAllLocalizations().observe(this, new Observer<List<Localizations>>() {
+            @Override
+            public void onChanged(List<Localizations> localizations) {
+                adapter2.setLocalizations(localizations);
+            }
+        });*/
+
+
+        //APARECER TABELA ATIVIDADES
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         adapter = new AtividadeAdapter(getContext());
