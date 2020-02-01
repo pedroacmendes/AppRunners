@@ -49,6 +49,7 @@ import android.widget.Toast;
 import com.example.runners.adapters.AtividadeAdapter;
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
+import com.example.runners.repository.AtividadeRepository;
 import com.example.runners.repository.LocalizationsRepository;
 import com.example.runners.viewModel.AtividadeViewModel;
 import com.example.runners.viewModel.LocalizationsViewModel;
@@ -76,6 +77,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -93,7 +95,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
-    Cliques cliques;
+    private Cliques cliques;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
     private static final int REQUEST_FINE_LOCATION = 100;
@@ -111,9 +113,9 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private Chronometer ch;
     private long milliseconds;
 
-    LocalizationsViewModel localizationsViewModel;
-    LocalizationsRepository localizationsRepository;
-    AtividadeViewModel atividadeViewModel;
+    private LocalizationsViewModel localizationsViewModel;
+    private LocalizationsRepository localizationsRepository;
+    private AtividadeViewModel atividadeViewModel;
 
     // passos
     private int count = 0;
@@ -143,7 +145,12 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private NotificationManager notificationManager;
     private MyReceiver mReceiver;
 
-    Atividade ultimaAtividade;
+    private Atividade ultimaAtividade;
+
+    private Atividade atividade;
+
+    ArrayList<Double> latitudeArray = new ArrayList<>();
+    ArrayList<Double> longitudeArray = new ArrayList<>();
 
     public FragmentAtividade() {
     }
@@ -171,6 +178,9 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
         mSensorManager = (SensorManager) getContext().getSystemService(SENSOR_SERVICE);
         mDetect = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        if (mSensorManager == null) {
+            Toast.makeText(getActivity(), "A aplicação não reconheceu o sensor de passos.", Toast.LENGTH_SHORT).show();
+        }
         nPassos = view.findViewById(R.id.nPassos);
 
         milliseconds = 0;
@@ -199,6 +209,9 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
                     addMarker(location);
 
+                    latitudeArray.add(location.getLatitude());
+                    longitudeArray.add(location.getLongitude());
+
                     mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
 
                     int calorias = getpassos() / 20;
@@ -225,30 +238,28 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                         txthoraStart.setText(horaStart);
                     }
 
-                    final double latitude = location.getLatitude();
-                    final double longitude = location.getLongitude();
-
                     localizationsViewModel = ViewModelProviders.of(getActivity()).get(LocalizationsViewModel.class);
                     atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
 
                     atividadeViewModel.getAllAtividade().observe(getActivity(), new Observer<List<Atividade>>() {
                         @Override
                         public void onChanged(List<Atividade> atividades) {
-                            if(atividades.size() == 0){
-                                Localizations l = new Localizations(0, 1, latitude, longitude);
-                                localizationsViewModel.insere(l);
-                            } else{
-                                ultimaAtividade = atividades.get(atividades.size() - 1);
-                                Localizations l = new Localizations(0, ultimaAtividade.getId(), latitude, longitude);
-                                localizationsViewModel.insere(l);
+                            ultimaAtividade = atividades.get(atividades.size() - 1);
+                            for (int i = 0; i < latitudeArray.size(); i++) {
+                                for (int j = 0; j < longitudeArray.size(); j++) {
+                                    Localizations l = new Localizations(0, ultimaAtividade.getId(), latitudeArray.get(0), longitudeArray.get(0));
+                                    localizationsViewModel.insere(l);
+                                    LatLng latLng = new LatLng(latitudeArray.get(0), longitudeArray.get(0));
+                                    line.add(latLng);
+                                    longitudeArray.remove(0);
+                                    latitudeArray.remove(0);
+                                }
                             }
                         }
                     });
-
-                    LatLng latLng = new LatLng(latitude, longitude);
-                    line.add(latLng);
-
                     Geocoder(location);
+                    ArrayList<Double> latitudeArray = null;
+                    ArrayList<Double> longitudeArray = null;
                 }
             }
         };
@@ -259,6 +270,17 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 startLocationUpdates();
                 createNotification();
                 mostrarNotificacao();
+                atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
+
+                String horaInicio = txthoraStart.getText().toString();
+                String temperatura = txtTemp.getText().toString();
+
+                Date dataHoraAtual = new Date();
+                String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
+
+                atividade = new Atividade(0, 0, "", data, 0, 0, 0, horaInicio, "", temperatura);
+                atividadeViewModel.insere(atividade);
+
                 ch.setBase(SystemClock.elapsedRealtime());
                 mSensorManager.registerListener(new ProxSensor(), mDetect, SensorManager.SENSOR_DELAY_FASTEST);
                 ch.start();
@@ -270,11 +292,10 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 stopLocationUpdates();
                 cancelNotificacao();
-
                 int calorias = getArguments().getInt("calorias");
                 int speed = getArguments().getInt("speed");
                 int passos = getArguments().getInt("passos");
-                long altitude = getArguments().getInt("altitude");
+                double altitude = getArguments().getDouble("altitude");
 
                 String horaInicio = txthoraStart.getText().toString();
                 String temperatura = txtTemp.getText().toString();
@@ -292,17 +313,15 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
                 atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
 
-                Atividade atividade = new Atividade(0,speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
-
-                atividadeViewModel.insere(atividade);
+                atividade = new Atividade(ultimaAtividade.getId(), speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura);
+                atividadeViewModel.update(atividade);
 
                 ch.setBase(SystemClock.elapsedRealtime());
 
                 cliques.mudarFrag3();
-
             }
-        }
-        );
+        });
+
         return view;
     }
 
@@ -469,7 +488,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
     }
 
-
     //PASSOS
     public class ProxSensor implements SensorEventListener {
 
@@ -489,7 +507,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         return count;
     }
 
-
     //NOTIFICAÇAO
     private void createNotification() {
 
@@ -497,11 +514,11 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         PendingIntent botaoPendingIntent = PendingIntent.getBroadcast(getContext(), 0, botao, PendingIntent.FLAG_ONE_SHOT);
 
         builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_name)
+                .setSmallIcon(R.mipmap.icon_app)
                 .setContentTitle("Atividade iniciada!")
-                .setContentText("Passos: " + count + "   |   Distancia: 0km")
+                .setContentText("Passos: " + getpassos())
                 .setUsesChronometer(true)
-                .addAction(R.drawable.ic_stat_name, "Mostar mapa", botaoPendingIntent)
+                .addAction(R.mipmap.icon_app, "Mostar mais", botaoPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         Intent resultIntent = new Intent(getContext(), MainActivity.class);
@@ -531,9 +548,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     public void alterarNotificao() {
 
         NotificationCompat.BigPictureStyle bpStyle = new NotificationCompat.BigPictureStyle();
-        bpStyle.bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.mascot_1)).build();
+        bpStyle.bigPicture(BitmapFactory.decodeResource(getResources(), R.mipmap.icon_app)).build();
         builder.setStyle(bpStyle);
-        //builder.setContentTitle("Atividade com mapa");
         mostrarNotificacao();
     }
 
@@ -547,7 +563,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
             alterarNotificao();
         }
     }
-
 
     @Override
     public void onAttach(Context context) {

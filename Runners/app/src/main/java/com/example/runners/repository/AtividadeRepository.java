@@ -25,8 +25,8 @@ public class AtividadeRepository {
         new InsertAsync(atividadeDAO).execute(a);
     }
 
-    public void updateAtividade(int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura, int id){
-        atividadeDAO.update(speed, time, data, altitude, passos, calorias, horaInicio, horaFim, temperatura, id);
+    public void updateAtividade(Atividade a){
+        new UpdateAsync(atividadeDAO).execute(a);
     }
 
     public LiveData<List<Atividade>> getAllAtividades(){
@@ -52,5 +52,25 @@ public class AtividadeRepository {
         }
     }
 
+    private static class UpdateAsync extends AsyncTask<Atividade,Void,Void> {
+
+        private AtividadeDAO atividadeDAO;
+
+        public UpdateAsync(AtividadeDAO atividadeDAO) {
+            this.atividadeDAO = atividadeDAO;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+        @Override
+        protected Void doInBackground(Atividade... atividades) {
+
+            atividadeDAO.updateAtividade(atividades[0]);
+            return null;
+        }
+    }
 
 }

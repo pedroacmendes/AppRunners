@@ -70,7 +70,7 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
                     bundle.putInt("speedAtividade", atividade.getSpeed());
                     bundle.putString("timeAtividade", atividade.getTime());
                     bundle.putString("dataAtividade", atividade.getData());
-                    bundle.putLong("altitudeAtividade", atividade.getAltitude());
+                    bundle.putDouble("altitudeAtividade", atividade.getAltitude());
                     bundle.putInt("passosAtividade", atividade.getPassos());
                     bundle.putInt("caloriasAtividade", atividade.getCalorias());
                     bundle.putString("horaInicioAtividade", atividade.getHoraInicio());

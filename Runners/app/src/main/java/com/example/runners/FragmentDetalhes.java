@@ -136,7 +136,8 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                         txt_speed.setText("" + ultimaAtividade.getSpeed());
                         txt_time.setText(ultimaAtividade.getTime());
                         txt_subTitulo.setText("Dia " + ultimaAtividade.getData() + ", as " + ultimaAtividade.getHoraInicio() + " com " + ultimaAtividade.getTemperatura() + " de temperatura.");
-                        txt_altitude.setText(" " + ultimaAtividade.getAltitude());
+                        int altitude = (int) ultimaAtividade.getAltitude();
+                        txt_altitude.setText(" " + altitude);
                         txt_passos.setText("" + ultimaAtividade.getPassos());
                         txt_calorias.setText("" + ultimaAtividade.getCalorias());
 
@@ -154,7 +155,8 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
             int speedAtividade = getArguments().getInt("speedAtividade");
             String timeAtividade = getArguments().getString("timeAtividade");
             String dataAtividade = getArguments().getString("dataAtividade");
-            long altitudeAtividade = getArguments().getLong("altitudeAtividade");
+            double altitudeAtividade = getArguments().getDouble("altitudeAtividade");
+            int altitude = (int) altitudeAtividade;
             int passosAtividade = getArguments().getInt("passosAtividade");
             int caloriasAtividade = getArguments().getInt("caloriasAtividade");
             String temperaturaAtividade = getArguments().getString("temperaturaAtividade");
@@ -163,7 +165,7 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
             txt_speed.setText("" + speedAtividade);
             txt_time.setText(timeAtividade);
             txt_subTitulo.setText("Dia " + dataAtividade + ", as " + getArguments().getString("horaInicioAtividade") + " com " + temperaturaAtividade + " de temperatura.");
-            txt_altitude.setText("" + altitudeAtividade);
+            txt_altitude.setText("" + altitude);
             txt_passos.setText("" + passosAtividade);
             txt_calorias.setText("" + caloriasAtividade);
 

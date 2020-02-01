@@ -46,7 +46,7 @@ public class FragmentHistorico extends Fragment {
 
         //APARECER TABELA LOCALIZATIONS
 
-        /*RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
+     /*   RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         adapter2 = new LocalizationAdapter(getContext());
         recyclerView.setAdapter(adapter2);
 

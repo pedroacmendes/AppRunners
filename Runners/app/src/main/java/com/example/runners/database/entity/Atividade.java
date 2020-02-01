@@ -14,14 +14,14 @@ public class Atividade {
     private int speed;
     private String time;
     private String data;
-    private long altitude;
+    private double altitude;
     private int passos;
     private int calorias;
     private String horaInicio;
     private String horaFim;
     private String temperatura;
 
-    public Atividade(int id, int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
+    public Atividade(int id, int speed, String time, String data, double altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura) {
         this.id = id;
         this.speed = speed;
         this.time = time;
@@ -66,7 +66,7 @@ public class Atividade {
         this.time = time;
     }
 
-    public long getAltitude() {
+    public double getAltitude() {
         return altitude;
     }
 

@@ -23,6 +23,12 @@ public interface AtividadeDAO {
     @Query("SELECT * FROM atividade WHERE speed = 0")
     LiveData<List<Atividade>> getAtividade();
 
-    @Query("UPDATE atividade SET speed= :speed, time = :time, data= :data, altitude=:altitude, passos=:passos,calorias=:calorias,horaInicio=:horaInicio, horaFim=:horaFim, temperatura=:temperatura WHERE id= :id")
-    void update(int speed, String time, String data, long altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura, int id);
+   /* @Query("UPDATE atividade SET speed= :speed, time = :time, data= :data, altitude=:altitude, passos=:passos,calorias=:calorias,horaInicio=:horaInicio, horaFim=:horaFim, temperatura=:temperatura WHERE id= :id")
+    void update(int speed, String time, String data, double altitude, int passos, int calorias, String horaInicio, String horaFim, String temperatura, int id);
+*/
+
+   @Update
+    void updateAtividade(Atividade...atividades);
+
+
 }
