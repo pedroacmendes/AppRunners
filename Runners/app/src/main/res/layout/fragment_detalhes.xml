@@ -35,8 +35,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="20dp"
         android:paddingLeft="20dp"
+        android:paddingTop="20dp"
         android:paddingRight="20dp"
         android:paddingBottom="15dp">
 
@@ -64,8 +64,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textAlignment="center"
                 android:text="Distancia"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF" />
 
             <TextView
@@ -82,8 +82,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textAlignment="center"
                 android:text="Passos"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF" />
 
             <TextView
@@ -110,8 +110,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textAlignment="center"
                 android:text="Duração"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF" />
 
             <TextView
@@ -128,8 +128,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textAlignment="center"
                 android:text="Velocidade"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF" />
 
             <TextView
@@ -156,8 +156,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textAlignment="center"
                 android:text="Calorias"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF" />
 
             <TextView
@@ -174,8 +174,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textAlignment="center"
                 android:text="Altitude"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF" />
 
             <TextView

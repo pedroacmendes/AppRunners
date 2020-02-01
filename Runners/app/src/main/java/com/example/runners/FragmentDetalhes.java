@@ -2,6 +2,7 @@ package com.example.runners;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -50,6 +51,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import retrofit2.Call;
@@ -62,29 +64,23 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
 
-    TextView txt_speed;
-    TextView txt_time;
-    TextView txt_subTitulo;
-    TextView txt_titulo;
-    TextView txt_altitude;
-    TextView txt_passos;
-    TextView txt_calorias;
-    TextView txt_distancia;
-
+    private TextView txt_speed;
+    private TextView txt_time;
+    private TextView txt_subTitulo;
+    private TextView txt_titulo;
+    private TextView txt_altitude;
+    private TextView txt_passos;
+    private TextView txt_calorias;
+    private TextView txt_distancia;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
-
-    public PolylineOptions line = new PolylineOptions().color(Color.RED);
-
-    Context mContext;
-
-    LiveData<List<Localizations>> Locais;
-    List<Localizations> coordenadas;
-
-    Atividade ultimaAtividade;
-
-    LocalizationsViewModel localizationsViewModel;
-    AtividadeViewModel atividadeViewModel;
+    private PolylineOptions line = new PolylineOptions().color(Color.RED);
+    private Context mContext;
+    private LiveData<List<Localizations>> Locais;
+    private List<Localizations> coordenadas;
+    private Atividade ultimaAtividade;
+    private LocalizationsViewModel localizationsViewModel;
+    private AtividadeViewModel atividadeViewModel;
 
     public FragmentDetalhes() {
     }
@@ -120,17 +116,21 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         txt_calorias = view.findViewById(R.id.txt_calorias);
         txt_distancia = view.findViewById(R.id.txt_distancia);
 
-        if(getArguments() == null){
+        atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
+        localizationsViewModel = ViewModelProviders.of(this).get(LocalizationsViewModel.class);
 
-            atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
+        if (getArguments() == null) {
 
             atividadeViewModel.getAllAtividade().observe(getActivity(), new Observer<List<Atividade>>() {
                 @Override
                 public void onChanged(List<Atividade> atividades) {
 
                     if (atividades.size() == 0) {
+
                         txt_titulo.setText("Sem caminhadas realizadas");
+
                     } else {
+
                         ultimaAtividade = atividades.get(atividades.size() - 1);
                         txt_titulo.setText("Detalhes de caminhada: " + ultimaAtividade.getId());
                         txt_speed.setText("" + ultimaAtividade.getSpeed());
@@ -140,35 +140,7 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                         txt_passos.setText("" + ultimaAtividade.getPassos());
                         txt_calorias.setText("" + ultimaAtividade.getCalorias());
 
-                        atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
-                        localizationsViewModel = ViewModelProviders.of(getActivity()).get(LocalizationsViewModel.class);
-
-                        Locais = localizationsViewModel.getLocalizationById(ultimaAtividade.getId());
-                        Locais.observe(getActivity(), new Observer<List<Localizations>>() {
-                            @Override
-                            public void onChanged(List<Localizations> localizations) {
-                                coordenadas = localizations;
-                                for (int i = 0; i <= coordenadas.size() - 1; i++) {
-                                    Localizations l = coordenadas.get(i);
-                                    double lat = l.getLatitude();
-                                    double lon = l.getLongitude();
-                                    /*if (i == 0) {
-                                        addMarker(lat, lon, 0);
-                                        double lat1 = lat;
-                                        double lon1 = lon;
-                                    } else if (i == coordenadas.size() - 1) {
-                                        addMarker(lat, lon, 1);
-                                        double lat2 = lat;
-                                        double lon2 = lon;
-                                        // calculaDistancia(lat1, lon1, lat2, lon2);
-                                    } else {
-                                        addMarker(lat, lon, 2);
-                                    }*/
-                                    LatLng latLng = new LatLng(lat, lon);
-                                    line.add(latLng);
-                                }
-                            }
-                        });
+                        //atualiza();
 
                     }
                 }
@@ -176,38 +148,9 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
 
         } else {
 
+            atualiza();
+
             int idAtividade = getArguments().getInt("idAtividade");
-
-            atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
-            localizationsViewModel = ViewModelProviders.of(this).get(LocalizationsViewModel.class);
-
-            Locais = localizationsViewModel.getLocalizationById(idAtividade);
-            Locais.observe(this, new Observer<List<Localizations>>() {
-                @Override
-                public void onChanged(List<Localizations> localizations) {
-                    coordenadas = localizations;
-                    for (int i = 0; i <= coordenadas.size() - 1; i++) {
-                        Localizations l = coordenadas.get(i);
-                        double lat = l.getLatitude();
-                        double lon = l.getLongitude();
-                        if (i == 0) {
-                            addMarker(lat, lon, 0);
-                            double lat1 = lat;
-                            double lon1 = lon;
-                        } else if (i == coordenadas.size() - 1) {
-                            addMarker(lat, lon, 1);
-                            double lat2 = lat;
-                            double lon2 = lon;
-                            // calculaDistancia(lat1, lon1, lat2, lon2);
-                        } else {
-                            addMarker(lat, lon, 2);
-                        }
-                        LatLng latLng = new LatLng(lat, lon);
-                        line.add(latLng);
-                    }
-                }
-            });
-
             int speedAtividade = getArguments().getInt("speedAtividade");
             String timeAtividade = getArguments().getString("timeAtividade");
             String dataAtividade = getArguments().getString("dataAtividade");
@@ -227,7 +170,7 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         }
 
         return view;
-}
+    }
 
     public void onMapReady(GoogleMap map) {
         mGoogleMap = map;
@@ -254,23 +197,80 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         mGoogleMap.addPolyline(line);
     }
 
-    private double calculaDistancia(double lat1, double long1, double lat2, double long2) {
+    public double calculaDistanciaEmKM(List<Localizations> lo, TextView txt) {
 
-        double earthRadius = 6371;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLng = Math.toRadians(long2 - long1);
+        int i = 0;
+        float distancia = 0;
+        while (i < coordenadas.size() - 2) {
+            Location start = new Location("Start Point");
+            start.setLatitude(coordenadas.get(i).getLatitude());
+            start.setLongitude(coordenadas.get(i).getLongitude());
+            Location finish = new Location("Finish Point");
+            finish.setLatitude(coordenadas.get(i + 1).getLatitude());
+            finish.setLongitude(coordenadas.get(i + 1).getLongitude());
+            float distance = start.distanceTo(finish);
+            distancia = distance + distancia;
+            i++;
+        }
+        DecimalFormat df = new DecimalFormat("##.##");
+        txt.setText(" " + df.format(distancia / 1000) + " km");
+        return distancia / 1000;
+    }
 
-        double sindLat = Math.sin(dLat / 2);
-        double sindLng = Math.sin(dLng / 2);
+    public void atualiza() {
 
-        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
-                * Math.cos(Math.toRadians(lat1))
-                * Math.cos(Math.toRadians(lat2));
+        if (getArguments() == null) {
+            int id = ultimaAtividade.getId();
 
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double dist = earthRadius * c;
+            Locais = localizationsViewModel.getLocalizationById(id);
+            Locais.observe(this, new Observer<List<Localizations>>() {
+                @Override
+                public void onChanged(List<Localizations> localizations) {
+                    coordenadas = localizations;
+                    for (int i = 0; i <= coordenadas.size() - 1; i++) {
+                        Localizations l = coordenadas.get(i);
+                        double lat = l.getLatitude();
+                        double lon = l.getLongitude();
+                        if (i == 0) {
+                            addMarker(lat, lon, 0);
+                        } else if (i == coordenadas.size() - 1) {
+                            addMarker(lat, lon, 1);
+                        } else {
+                            addMarker(lat, lon, 2);
+                        }
+                        LatLng latLng = new LatLng(lat, lon);
+                        line.add(latLng);
+                        calculaDistanciaEmKM(localizations, txt_distancia);
+                    }
+                }
+            });
 
-        return dist * 1000; //em metros
+        } else {
+            int id = getArguments().getInt("idAtividade");
+
+            Locais = localizationsViewModel.getLocalizationById(id);
+            Locais.observe(this, new Observer<List<Localizations>>() {
+                @Override
+                public void onChanged(List<Localizations> localizations) {
+                    coordenadas = localizations;
+                    for (int i = 0; i <= coordenadas.size() - 1; i++) {
+                        Localizations l = coordenadas.get(i);
+                        double lat = l.getLatitude();
+                        double lon = l.getLongitude();
+                        if (i == 0) {
+                            addMarker(lat, lon, 0);
+                        } else if (i == coordenadas.size() - 1) {
+                            addMarker(lat, lon, 1);
+                        } else {
+                            addMarker(lat, lon, 2);
+                        }
+                        LatLng latLng = new LatLng(lat, lon);
+                        line.add(latLng);
+                        calculaDistanciaEmKM(localizations, txt_distancia);
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -284,5 +284,6 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         super.onDetach();
         mContext = null;
     }
+
 
 }
