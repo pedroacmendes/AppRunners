@@ -1,7 +1,6 @@
 package com.androidmads.openweatherapi;
 
 import com.example.runners.WeatherResponse;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

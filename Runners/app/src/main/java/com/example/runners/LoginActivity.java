@@ -2,7 +2,6 @@ package com.example.runners;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -47,11 +45,9 @@ public class LoginActivity extends AppCompatActivity {
         btn_entrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*String email = edt_user.getText().toString().trim();
+                String email = edt_user.getText().toString().trim();
                 String password = edt_pass.getText().toString().trim();
-                login(email,password);*/
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
+                login(email,password);
             }
         });
 

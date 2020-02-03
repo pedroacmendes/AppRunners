@@ -4,9 +4,7 @@ import android.app.Application;
 import android.os.AsyncTask;
 import androidx.lifecycle.LiveData;
 import com.example.runners.database.AtividadeDatabase;
-import com.example.runners.database.dao.AtividadeDAO;
 import com.example.runners.database.dao.LocalizationsDAO;
-import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
 import java.util.List;
 

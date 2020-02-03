@@ -1,12 +1,10 @@
 package com.example.runners;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -15,19 +13,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.runners.adapters.AtividadeAdapter;
 import com.example.runners.adapters.LocalizationAdapter;
 import com.example.runners.database.entity.Atividade;
-import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
 import com.example.runners.viewModel.LocalizationsViewModel;
-
 import java.util.List;
 
 public class FragmentHistorico extends Fragment {
 
     private Context mContext;
-
     private AtividadeAdapter adapter;
     private AtividadeViewModel model;
-
     private LocalizationAdapter adapter2;
     private LocalizationsViewModel model2;
 
@@ -45,7 +39,6 @@ public class FragmentHistorico extends Fragment {
         View view = inflater.inflate(R.layout.fragment_historico, container, false);
 
         //APARECER TABELA LOCALIZATIONS
-
      /*   RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         adapter2 = new LocalizationAdapter(getContext());
         recyclerView.setAdapter(adapter2);
@@ -62,7 +55,6 @@ public class FragmentHistorico extends Fragment {
 
 
         //APARECER TABELA ATIVIDADES
-
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         adapter = new AtividadeAdapter(getContext());
         recyclerView.setAdapter(adapter);

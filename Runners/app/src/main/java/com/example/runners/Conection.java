@@ -1,7 +1,6 @@
 package com.example.runners;
 
 import androidx.annotation.NonNull;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -10,7 +9,6 @@ public class Conection {
     private static FirebaseAuth firebaseAuth;
     private static FirebaseAuth.AuthStateListener authStateListener;
     private static FirebaseUser firebaseUser;
-
 
     private Conection() {
     }

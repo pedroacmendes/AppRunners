@@ -1,40 +1,23 @@
 package com.example.runners;
 
-import android.Manifest;
+
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.ColorLong;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-
-import com.example.runners.adapters.AtividadeAdapter;
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
 import com.example.runners.viewModel.LocalizationsViewModel;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,24 +26,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
 
@@ -75,12 +43,12 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
     private PolylineOptions line = new PolylineOptions().color(Color.RED);
-    private Context mContext;
     private LiveData<List<Localizations>> Locais;
     private List<Localizations> coordenadas;
     private Atividade ultimaAtividade;
     private LocalizationsViewModel localizationsViewModel;
     private AtividadeViewModel atividadeViewModel;
+    Context mContext;
 
     public FragmentDetalhes() {
     }
@@ -132,6 +100,8 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                     } else {
 
                         ultimaAtividade = atividades.get(atividades.size() - 1);
+                        txt_passos.setText(ultimaAtividade + "");
+                        atualiza();
                         txt_titulo.setText("Detalhes de caminhada: " + ultimaAtividade.getId());
                         txt_speed.setText("" + ultimaAtividade.getSpeed());
                         txt_time.setText(ultimaAtividade.getTime());
@@ -140,8 +110,6 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                         txt_altitude.setText(" " + altitude);
                         txt_passos.setText("" + ultimaAtividade.getPassos());
                         txt_calorias.setText("" + ultimaAtividade.getCalorias());
-
-                        //atualiza();
 
                     }
                 }
@@ -222,9 +190,10 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
     public void atualiza() {
 
         if (getArguments() == null) {
-            int id = ultimaAtividade.getId();
 
-            Locais = localizationsViewModel.getLocalizationById(id);
+            int ultimaAtividade = txt_passos.getText().length();
+
+            Locais = localizationsViewModel.getLocalizationById(ultimaAtividade);
             Locais.observe(this, new Observer<List<Localizations>>() {
                 @Override
                 public void onChanged(List<Localizations> localizations) {

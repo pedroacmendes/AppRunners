@@ -3,18 +3,10 @@ package com.example.runners;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toolbar;
-
-import com.example.runners.database.entity.Atividade;
-import com.example.runners.database.entity.Localizations;
-import com.example.runners.viewModel.AtividadeViewModel;
-import com.example.runners.viewModel.LocalizationsViewModel;
-import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity implements Cliques {
 

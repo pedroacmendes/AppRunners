@@ -1,15 +1,11 @@
 package com.example.runners.viewModel;
 
 import android.app.Application;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
-import com.example.runners.repository.AtividadeRepository;
 import com.example.runners.repository.LocalizationsRepository;
-
 import java.util.List;
 
 public class LocalizationsViewModel extends AndroidViewModel {
@@ -22,7 +18,6 @@ public class LocalizationsViewModel extends AndroidViewModel {
         super(application);
         repository = new LocalizationsRepository(application);
         allLocalizations = repository.getAllLocalization();
-        //localizatiosById= repository.getLocalizationByID();
     }
 
     public LiveData<List<Localizations>> getAllLocalizations(){

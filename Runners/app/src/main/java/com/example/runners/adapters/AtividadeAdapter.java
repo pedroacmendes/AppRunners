@@ -7,18 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.runners.FragmentDetalhes;
 import com.example.runners.R;
 import com.example.runners.database.entity.Atividade;
-import com.example.runners.database.entity.Localizations;
-
 import java.util.List;
 
 public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.AtividadeHolder> {
@@ -80,18 +76,12 @@ public class AtividadeAdapter extends RecyclerView.Adapter<AtividadeAdapter.Ativ
                     FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
                     fragmentDetalhes.setArguments(bundle);
 
-                    //if(isSmatphone){
-                        transaction.replace(R.id.container, fragmentDetalhes);
-                    /*} else {
-                        transaction.replace(R.id.fragment2, fragmentDetalhes);
-                    }*/
+                    transaction.replace(R.id.container, fragmentDetalhes);
 
                     transaction.commit();
-
                 }
             });
         }
-
     }
 
     @Override

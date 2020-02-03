@@ -1,29 +1,22 @@
 package com.example.runners.adapters;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.runners.FragmentDetalhes;
 import com.example.runners.R;
-import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
-
 import java.util.List;
 
-import static android.media.CamcorderProfile.get;
-
-public class LocalizationAdapter extends RecyclerView.Adapter<LocalizationAdapter.LocalizationHolder>  {
+public class LocalizationAdapter extends RecyclerView.Adapter<LocalizationAdapter.LocalizationHolder> {
 
     private List<Localizations> localizations;
     private Context mContext;
@@ -69,15 +62,9 @@ public class LocalizationAdapter extends RecyclerView.Adapter<LocalizationAdapte
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
 
                     FragmentDetalhes fragmentDetalhes = new FragmentDetalhes();
-
-                    if(isSmatphone){
-                        transaction.replace(R.id.container, fragmentDetalhes);
-                    } else {
-                        transaction.replace(R.id.fragment2, fragmentDetalhes);
-                    }
+                    transaction.replace(R.id.container, fragmentDetalhes);
 
                     transaction.commit();
-
                 }
             });
         }

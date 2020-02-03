@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -23,18 +22,13 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,12 +39,8 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.runners.adapters.AtividadeAdapter;
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
-import com.example.runners.repository.AtividadeRepository;
-import com.example.runners.repository.LocalizationsRepository;
 import com.example.runners.viewModel.AtividadeViewModel;
 import com.example.runners.viewModel.LocalizationsViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -62,16 +52,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-import org.w3c.dom.DOMImplementation;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -81,16 +65,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.content.Context.SENSOR_SERVICE;
-import static android.media.CamcorderProfile.get;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
@@ -114,7 +95,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     private long milliseconds;
 
     private LocalizationsViewModel localizationsViewModel;
-    private LocalizationsRepository localizationsRepository;
     private AtividadeViewModel atividadeViewModel;
 
     // passos
@@ -229,7 +209,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                     setArguments(bundle);
 
                     txtAltitude.setText(" Altitude:" + location.getAltitude());
-                    txtLocation.setText(" GPS: " + location.getLatitude() + " , " + location.getLongitude());
                     txtSpeed.setText(" Velocidade: " + Speed);
                     nPassos.setText(" Passos: " + getpassos());
                     txt_kcal.setText(" Calorias: " + calorias);
@@ -325,7 +304,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
-
     private void getLastLocation() {
         if (ActivityCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -364,7 +342,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
         mGeocoder = new Geocoder(getContext(), Locale.getDefault());
         try {
             List<Address> lista = mGeocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            //txtGeode.setText(lista.get(0).getAddressLine(0)); //ESCREVE A MORADA NUMA TEXTVIEW
+            txtLocation.setText(lista.get(0).getAddressLine(0));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -377,7 +355,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     public void addMarker(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         mGoogleMap.addPolyline(line);
-        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
     }
 
     private void requestPermissions() {
@@ -444,7 +422,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                             txtTemp.setText(t.getMessage());
                         }
                     });
-
                 }
             }
         })
@@ -457,7 +434,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
     }
 
     class AsyncTaskExample extends AsyncTask<URL, Integer, Bitmap> {
-
 
         @Override
         protected void onPreExecute() {
@@ -499,7 +475,6 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
         }
     }
 
@@ -518,7 +493,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
                 .setContentTitle("Atividade iniciada!")
                 .setContentText("Passos: " + getpassos())
                 .setUsesChronometer(true)
-                .addAction(R.mipmap.icon_app, "Mostar mais", botaoPendingIntent)
+                .addAction(R.mipmap.icon_app, "Mostrar mais", botaoPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         Intent resultIntent = new Intent(getContext(), MainActivity.class);
