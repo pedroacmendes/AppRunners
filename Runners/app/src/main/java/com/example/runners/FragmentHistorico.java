@@ -22,8 +22,6 @@ public class FragmentHistorico extends Fragment {
     private Context mContext;
     private AtividadeAdapter adapter;
     private AtividadeViewModel model;
-    private LocalizationAdapter adapter2;
-    private LocalizationsViewModel model2;
 
     public FragmentHistorico() {
     }
@@ -38,23 +36,6 @@ public class FragmentHistorico extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_historico, container, false);
 
-        //APARECER TABELA LOCALIZATIONS
-     /*   RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
-        adapter2 = new LocalizationAdapter(getContext());
-        recyclerView.setAdapter(adapter2);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        model2 = ViewModelProviders.of(this).get(LocalizationsViewModel.class);
-        model2.getAllLocalizations().observe(this, new Observer<List<Localizations>>() {
-            @Override
-            public void onChanged(List<Localizations> localizations) {
-                adapter2.setLocalizations(localizations);
-            }
-        });*/
-
-
-        //APARECER TABELA ATIVIDADES
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler);
         adapter = new AtividadeAdapter(getContext());
         recyclerView.setAdapter(adapter);

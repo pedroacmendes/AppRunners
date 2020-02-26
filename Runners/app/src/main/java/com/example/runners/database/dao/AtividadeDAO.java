@@ -28,5 +28,4 @@ public interface AtividadeDAO {
     @Delete
     void deleteAtividade(Atividade... atividades);
 
-
 }

@@ -187,9 +187,7 @@
                 android:textSize="21dp"
                 android:textStyle="bold" />
 
-
         </LinearLayout>
-
 
     </LinearLayout>
 
@@ -197,6 +195,8 @@
         android:id="@+id/btn_eliminar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:background="#EE0505"
         android:text="Eliminar Atividade" />
 
 </LinearLayout>

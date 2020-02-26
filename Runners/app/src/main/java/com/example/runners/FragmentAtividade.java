@@ -175,8 +175,8 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(2000);
+        mLocationRequest.setFastestInterval(2000);
 
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
@@ -297,7 +297,9 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
                 ch.setBase(SystemClock.elapsedRealtime());
 
-                cliques.mudarFrag3();
+                Toast.makeText(getActivity(), "Terminou atividade!", Toast.LENGTH_SHORT).show();
+
+
             }
         });
 

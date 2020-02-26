@@ -123,7 +123,7 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
                 alert.setTitle("Eliminar");
-                alert.setMessage("Tem a certeza que pretende eliminar a Atividade?");
+                alert.setMessage("Tem a certeza que pretende eliminar esta atividade?");
                 alert.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
 
                     @Override
@@ -143,8 +143,8 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                         });
                         FragmentManager fragmentManager = ((FragmentActivity) getContext()).getSupportFragmentManager();
                         FragmentTransaction transaction = fragmentManager.beginTransaction();
-                        FragmentDetalhes FragmentDetalhes = new FragmentDetalhes();
-                        transaction.replace(R.id.container, FragmentDetalhes);
+                        FragmentHistorico FragmentHistorico = new FragmentHistorico();
+                        transaction.replace(R.id.container, FragmentHistorico);
                         transaction.commit();
                     }
                 });
