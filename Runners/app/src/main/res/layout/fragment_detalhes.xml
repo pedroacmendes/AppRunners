@@ -193,20 +193,11 @@
 
     </LinearLayout>
 
-
-    <LinearLayout
+    <Button
+        android:id="@+id/btn_eliminar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingTop="15dp"
-        android:paddingRight="20dp">
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="1dp"
-            android:background="#F3EFEF" />
-
-    </LinearLayout>
+        android:text="Eliminar Atividade" />
 
 </LinearLayout>
 

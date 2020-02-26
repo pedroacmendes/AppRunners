@@ -34,6 +34,9 @@ public class LoginActivity extends AppCompatActivity {
         txt_registar = findViewById(R.id.txt_registar);
         txt_recuperaPass = findViewById(R.id.txt_recuperaPass);
 
+        edt_user.setText("pedroacmendes@hotmail.com");
+        edt_pass.setText("123456789");
+
         txt_registar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

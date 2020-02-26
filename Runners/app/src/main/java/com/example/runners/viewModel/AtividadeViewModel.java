@@ -12,21 +12,16 @@ public class AtividadeViewModel extends AndroidViewModel {
 
     private AtividadeRepository repository;
     private LiveData<List<Atividade>> allAtividade;
-    private LiveData<List<Atividade>> atividade_1;
+    private LiveData<List<Atividade>> getAtividade;
 
     public AtividadeViewModel(@NonNull Application application) {
         super(application);
         repository = new AtividadeRepository(application);
         allAtividade = repository.getAllAtividades();
-        atividade_1 = repository.getAtividade();
     }
 
     public LiveData<List<Atividade>> getAllAtividade(){
         return allAtividade;
-    }
-
-    public LiveData<List<Atividade>> getAtividade(){
-        return atividade_1;
     }
 
     public void insere(Atividade atividade){
@@ -35,6 +30,14 @@ public class AtividadeViewModel extends AndroidViewModel {
 
     public void update(Atividade atividade){
         repository.updateAtividade(atividade);
+    }
+
+    public void deleteAtividade(Atividade a){
+        repository.deleleAtividade(a);
+    }
+
+    public LiveData<List<Atividade>> getAtividade(int idAtividade) {
+        return getAtividade = repository.getAtividade(idAtividade);
     }
 
 }

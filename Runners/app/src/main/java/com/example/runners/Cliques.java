@@ -8,4 +8,6 @@ public interface Cliques {
 
     void mudarFrag3();
 
+    void mudarAtividade();
+
 }

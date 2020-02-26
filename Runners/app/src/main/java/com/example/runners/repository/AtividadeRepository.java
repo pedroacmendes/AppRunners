@@ -12,13 +12,12 @@ public class AtividadeRepository {
 
     private AtividadeDAO atividadeDAO;
     private LiveData<List<Atividade>> allAtividades;
-    private LiveData<List<Atividade>> atividade_1;
+    private LiveData<List<Atividade>> getAtividade;
 
     public AtividadeRepository(Application application){
         AtividadeDatabase db = AtividadeDatabase.getInstance(application);
         atividadeDAO = db.atividadeDao();
         allAtividades = atividadeDAO.getAllAtividade();
-        atividade_1 = atividadeDAO.getAtividade();
     }
 
     public void insereAtividade(Atividade a){
@@ -29,13 +28,18 @@ public class AtividadeRepository {
         new UpdateAsync(atividadeDAO).execute(a);
     }
 
+    public  void deleleAtividade(Atividade a){
+        new DeleteAsync(atividadeDAO).execute(a);
+    }
+
     public LiveData<List<Atividade>> getAllAtividades(){
         return allAtividades;
     }
 
-    public LiveData<List<Atividade>> getAtividade(){
-        return atividade_1;
+    public LiveData<List<Atividade>> getAtividade(int idAtividade){
+        return getAtividade = atividadeDAO.getAtividate(idAtividade);
     }
+
 
     private static class InsertAsync extends AsyncTask<Atividade, Void, Void> {
 
@@ -72,5 +76,20 @@ public class AtividadeRepository {
             return null;
         }
     }
+
+    private static class DeleteAsync extends AsyncTask<Atividade,Void,Void> {
+        private AtividadeDAO atividadeDAO;
+
+        public DeleteAsync(AtividadeDAO atividadeDAO) {
+            this.atividadeDAO = atividadeDAO;
+        }
+
+        @Override
+        protected Void doInBackground(Atividade... atividades) {
+            atividadeDAO.deleteAtividade(atividades[0]);
+            return null;
+        }
+    }
+
 
 }

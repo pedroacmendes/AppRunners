@@ -2,18 +2,26 @@ package com.example.runners;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
 import com.example.runners.database.entity.Atividade;
 import com.example.runners.database.entity.Localizations;
 import com.example.runners.viewModel.AtividadeViewModel;
@@ -27,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -40,10 +49,12 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
     private TextView txt_passos;
     private TextView txt_calorias;
     private TextView txt_distancia;
+    private Button btn_eliminar;
     private GoogleMap mGoogleMap;
     private SupportMapFragment mMapFragment;
     private PolylineOptions line = new PolylineOptions().color(Color.RED);
     private LiveData<List<Localizations>> Locais;
+    LiveData<List<Atividade>> Atividades;
     private List<Localizations> coordenadas;
     private Atividade ultimaAtividade;
     private LocalizationsViewModel localizationsViewModel;
@@ -83,64 +94,75 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
         txt_passos = view.findViewById(R.id.txt_passos);
         txt_calorias = view.findViewById(R.id.txt_calorias);
         txt_distancia = view.findViewById(R.id.txt_distancia);
+        btn_eliminar = view.findViewById(R.id.btn_eliminar);
 
         atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
         localizationsViewModel = ViewModelProviders.of(this).get(LocalizationsViewModel.class);
 
-        if (getArguments() == null) {
+        atualiza();
 
-            atividadeViewModel.getAllAtividade().observe(getActivity(), new Observer<List<Atividade>>() {
-                @Override
-                public void onChanged(List<Atividade> atividades) {
+        int speedAtividade = getArguments().getInt("speedAtividade");
+        String timeAtividade = getArguments().getString("timeAtividade");
+        String dataAtividade = getArguments().getString("dataAtividade");
+        double altitudeAtividade = getArguments().getDouble("altitudeAtividade");
+        int altitude = (int) altitudeAtividade;
+        int passosAtividade = getArguments().getInt("passosAtividade");
+        int caloriasAtividade = getArguments().getInt("caloriasAtividade");
+        String temperaturaAtividade = getArguments().getString("temperaturaAtividade");
 
-                    if (atividades.size() == 0) {
+        txt_titulo.setText("Detalhes de caminhada: ");
+        txt_speed.setText("" + speedAtividade);
+        txt_time.setText(timeAtividade);
+        txt_subTitulo.setText("Dia " + dataAtividade + ", as " + getArguments().getString("horaInicioAtividade") + " com " + temperaturaAtividade + " de temperatura.");
+        txt_altitude.setText("" + altitude);
+        txt_passos.setText("" + passosAtividade);
+        txt_calorias.setText("" + caloriasAtividade);
 
-                        txt_titulo.setText("Sem caminhadas realizadas");
+        btn_eliminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+                alert.setTitle("Eliminar");
+                alert.setMessage("Tem a certeza que pretende eliminar a Atividade?");
+                alert.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
 
-                    } else {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int idAtividade = getArguments().getInt("idAtividade");
+                        atividadeViewModel = ViewModelProviders.of(getActivity()).get(AtividadeViewModel.class);
 
-                        ultimaAtividade = atividades.get(atividades.size() - 1);
-                        txt_passos.setText(ultimaAtividade + "");
-                        atualiza();
-                        txt_titulo.setText("Detalhes de caminhada: " + ultimaAtividade.getId());
-                        txt_speed.setText("" + ultimaAtividade.getSpeed());
-                        txt_time.setText(ultimaAtividade.getTime());
-                        txt_subTitulo.setText("Dia " + ultimaAtividade.getData() + ", as " + ultimaAtividade.getHoraInicio() + " com " + ultimaAtividade.getTemperatura() + " de temperatura.");
-                        int altitude = (int) ultimaAtividade.getAltitude();
-                        txt_altitude.setText(" " + altitude);
-                        txt_passos.setText("" + ultimaAtividade.getPassos());
-                        txt_calorias.setText("" + ultimaAtividade.getCalorias());
+                        Atividades = atividadeViewModel.getAtividade(idAtividade);
+                        Atividades.observe(getActivity(), new Observer<List<Atividade>>() {
+                            @Override
+                            public void onChanged(List<Atividade> atividades) {
+                                Atividades.removeObserver(this);
+                                Atividade a = atividades.get(0);
+                                atividadeViewModel.deleteAtividade(a);
 
+                            }
+                        });
+                        FragmentManager fragmentManager = ((FragmentActivity) getContext()).getSupportFragmentManager();
+                        FragmentTransaction transaction = fragmentManager.beginTransaction();
+                        FragmentDetalhes FragmentDetalhes = new FragmentDetalhes();
+                        transaction.replace(R.id.container, FragmentDetalhes);
+                        transaction.commit();
                     }
-                }
-            });
+                });
 
-        } else {
+                alert.setNegativeButton("Não", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
 
-            atualiza();
+                alert.show();
 
-            int idAtividade = getArguments().getInt("idAtividade");
-            int speedAtividade = getArguments().getInt("speedAtividade");
-            String timeAtividade = getArguments().getString("timeAtividade");
-            String dataAtividade = getArguments().getString("dataAtividade");
-            double altitudeAtividade = getArguments().getDouble("altitudeAtividade");
-            int altitude = (int) altitudeAtividade;
-            int passosAtividade = getArguments().getInt("passosAtividade");
-            int caloriasAtividade = getArguments().getInt("caloriasAtividade");
-            String temperaturaAtividade = getArguments().getString("temperaturaAtividade");
-
-            txt_titulo.setText("Detalhes de caminhada: " + idAtividade);
-            txt_speed.setText("" + speedAtividade);
-            txt_time.setText(timeAtividade);
-            txt_subTitulo.setText("Dia " + dataAtividade + ", as " + getArguments().getString("horaInicioAtividade") + " com " + temperaturaAtividade + " de temperatura.");
-            txt_altitude.setText("" + altitude);
-            txt_passos.setText("" + passosAtividade);
-            txt_calorias.setText("" + caloriasAtividade);
-
-        }
+            }
+        });
 
         return view;
-    }
+}
 
     public void onMapReady(GoogleMap map) {
         mGoogleMap = map;
@@ -189,34 +211,6 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
 
     public void atualiza() {
 
-        if (getArguments() == null) {
-
-            int ultimaAtividade = txt_passos.getText().length();
-
-            Locais = localizationsViewModel.getLocalizationById(ultimaAtividade);
-            Locais.observe(this, new Observer<List<Localizations>>() {
-                @Override
-                public void onChanged(List<Localizations> localizations) {
-                    coordenadas = localizations;
-                    for (int i = 0; i <= coordenadas.size() - 1; i++) {
-                        Localizations l = coordenadas.get(i);
-                        double lat = l.getLatitude();
-                        double lon = l.getLongitude();
-                        if (i == 0) {
-                            addMarker(lat, lon, 0);
-                        } else if (i == coordenadas.size() - 1) {
-                            addMarker(lat, lon, 1);
-                        } else {
-                            addMarker(lat, lon, 2);
-                        }
-                        LatLng latLng = new LatLng(lat, lon);
-                        line.add(latLng);
-                        calculaDistanciaEmKM(localizations, txt_distancia);
-                    }
-                }
-            });
-
-        } else {
             int id = getArguments().getInt("idAtividade");
 
             Locais = localizationsViewModel.getLocalizationById(id);
@@ -241,7 +235,7 @@ public class FragmentDetalhes extends Fragment implements OnMapReadyCallback {
                     }
                 }
             });
-        }
+
     }
 
     @Override
