@@ -52,6 +52,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -78,6 +79,7 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
     private Cliques cliques;
     private GoogleMap mGoogleMap;
+    private GoogleMap mGoogleMap2;
     private SupportMapFragment mMapFragment;
     private static final int REQUEST_FINE_LOCATION = 100;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -352,12 +354,24 @@ public class FragmentAtividade extends Fragment implements OnMapReadyCallback {
 
     public void onMapReady(GoogleMap map) {
         mGoogleMap = map;
+        mGoogleMap2 = map;
     }
 
     public void addMarker(Location location) {
+        mGoogleMap.clear();
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         mGoogleMap.addPolyline(line);
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18));
+        mGoogleMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(10)
+                .strokeColor(Color.argb(50,0,0,10))
+                .fillColor(Color.argb(50,0,0,10)));
+        mGoogleMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(2)
+                .strokeColor(Color.argb(50,0,0,40))
+                .fillColor(Color.argb(50,0,0,40)));
     }
 
     private void requestPermissions() {
